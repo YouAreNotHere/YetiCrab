@@ -1,49 +1,40 @@
 import { Injectable } from '@nestjs/common';
-import { v4 as uuidv4 } from 'uuid';
-import { Attraction } from './attraction.interface';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Attraction } from './attraction.entity';
 import { CreateAttractionDto } from './create-attraction.dto';
 
 @Injectable()
 export class AttractionsService {
-  private attractions: Attraction[] = [];
+  constructor(
+      @InjectRepository(Attraction)
+      private readonly attractionsRepository: Repository<Attraction>,
+  ) {}
 
-  findAll(): Attraction[] {
-    return this.attractions;
+  async findAll(): Promise<Attraction[]> {
+    return this.attractionsRepository.find();
   }
 
-  findOne(id: string): Attraction | undefined {
-    return this.attractions.find((attraction) => attraction.id === id);
+  async findOne(id: string): Promise<Attraction | null> {
+    return this.attractionsRepository.findOneBy({ id });
   }
 
-  create(createAttractionDto: CreateAttractionDto): Attraction {
-    const attraction: Attraction = {
-      id: uuidv4(),
-      name: createAttractionDto.name,
-      description: createAttractionDto.description,
+  async create(createAttractionDto: CreateAttractionDto): Promise<Attraction> {
+    const attraction = this.attractionsRepository.create({
+      ...createAttractionDto,
+      mapLink: `https://www.google.com/maps?q=${createAttractionDto.latitude},${createAttractionDto.longitude}`,
+      isVisited: false,
       addedAt: new Date(),
-      rating: createAttractionDto.rating,
-      photoUrl: createAttractionDto.photoUrl,
-      location: createAttractionDto.location,
-      coordinates: createAttractionDto.coordinates,
-      mapLink: `https://www.google.com/maps?q=${createAttractionDto.coordinates.latitude},${createAttractionDto.coordinates.longitude}`,
-      isVisites: false,
-    };
-    this.attractions.push(attraction);
-    return attraction;
+    });
+    return this.attractionsRepository.save(attraction);
   }
 
-  update(
-    id: string,
-    updateAttractionDto: Partial<CreateAttractionDto>,
-  ): Attraction | undefined {
-    const attraction = this.findOne(id);
-    if (attraction) {
-      Object.assign(attraction, updateAttractionDto);
-    }
-    return attraction;
+  async update(id: string, updateAttractionDto: Partial<CreateAttractionDto>): Promise<Attraction | null> {
+    await this.attractionsRepository.update(id, updateAttractionDto);
+    return this.findOne(id);
   }
 
-  remove(id: string): void {
-    this.attractions = this.attractions.filter((attraction) => attraction.id !== id);
+  async remove(id: string): Promise<void> {
+    await this.attractionsRepository.delete(id);
   }
 }
