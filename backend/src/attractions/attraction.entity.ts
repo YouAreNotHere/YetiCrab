@@ -3,35 +3,35 @@ import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeor
 @Entity()
 export class Attraction {
     @PrimaryGeneratedColumn('uuid')
-    id: string;
+    id!: string;
 
     @Column()
-    name: string;
+    name!: string;
 
     @Column()
-    description: string;
+    description!: string;
 
     @CreateDateColumn()
-    addedAt: Date;
+    addedAt!: Date;
 
     @Column({ type: 'decimal', precision: 3, scale: 1 })
-    rating: number;
+    rating!: number;
 
     @Column()
-    photoUrl: string;
+    photoUrl!: string;
 
     @Column()
-    location: string;
+    location!: string;
 
     @Column('double')
-    latitude: number;
+    latitude!: number;
 
     @Column('double')
-    longitude: number;
+    longitude!: number;
 
     @Column()
-    mapLink: string;
+    mapLink!: string;
 
     @Column({ default: false })
-    isVisited: boolean;
+    isVisited!: boolean;
 }

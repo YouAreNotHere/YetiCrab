@@ -7,8 +7,8 @@ import { CreateAttractionDto } from './create-attraction.dto';
 @Injectable()
 export class AttractionsService {
   constructor(
-      @InjectRepository(Attraction)
-      private readonly attractionsRepository: Repository<Attraction>,
+    @InjectRepository(Attraction)
+    private readonly attractionsRepository: Repository<Attraction>,
   ) {}
 
   async findAll(): Promise<Attraction[]> {
@@ -20,11 +20,13 @@ export class AttractionsService {
   }
 
   async create(createAttractionDto: CreateAttractionDto): Promise<Attraction> {
+    console.log("create")
     const attraction = this.attractionsRepository.create({
       ...createAttractionDto,
       mapLink: `https://www.google.com/maps?q=${createAttractionDto.latitude},${createAttractionDto.longitude}`,
       isVisited: false,
       addedAt: new Date(),
+      rating: 0,
     });
     return this.attractionsRepository.save(attraction);
   }

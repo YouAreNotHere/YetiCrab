@@ -6,40 +6,71 @@ import {
   Param,
   Put,
   Delete,
+  UseInterceptors, 
+  UploadedFile,
 } from '@nestjs/common';
 import { AttractionsService } from './attractions.service';
 import { CreateAttractionDto } from './create-attraction.dto';
-import { Attraction } from './attraction.interface';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { Express } from 'express'; 
+
 
 @Controller('attractions')
 export class AttractionsController {
   constructor(private readonly attractionsService: AttractionsService) {}
 
   @Get()
-  findAll(): Attraction[] {
-    return this.attractionsService.findAll();
+  async findAll() {
+    console.log("get11122")
+    return await this.attractionsService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string): Attraction | undefined {
-    return this.attractionsService.findOne(id);
+  async findOne(@Param('id') id: string) {
+    return await this.attractionsService.findOne(id);
   }
 
   @Post()
-  create(@Body() createAttractionDto: CreateAttractionDto): Attraction {
-    return this.attractionsService.create(createAttractionDto);
+  @UseInterceptors(FileInterceptor('image'))
+  async create(
+    @Body('name') name: string,
+    @Body('description') description: string,
+    @Body('location') location: string,
+    @Body('latitude') latitude: string,
+    @Body('longitude') longitude: string,
+    @Body('photoUrl') photoUrl: string, // Опциональное поле
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    console.log('Received fields:', { name, description, location, latitude, longitude, photoUrl });
+    console.log('Uploaded File:', file);
+  
+    const createAttractionDto: CreateAttractionDto = {
+      name,
+      description,
+      location,
+      latitude: parseFloat(latitude),
+      longitude: parseFloat(longitude),
+      photoUrl: photoUrl || undefined,
+    };
+  
+    if (file) {
+      createAttractionDto.photoUrl = `/uploads/${file.originalname}`;
+    }
+  
+    return await this.attractionsService.create(createAttractionDto);
   }
 
+
   @Put(':id')
-  update(
+  async update(
     @Param('id') id: string,
     @Body() updateAttractionDto: Partial<CreateAttractionDto>,
-  ): Attraction | undefined {
-    return this.attractionsService.update(id, updateAttractionDto);
+  ) {
+    return await this.attractionsService.update(id, updateAttractionDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string): void {
+  async remove(@Param('id') id: string): Promise<void> {
     this.attractionsService.remove(id);
   }
 }

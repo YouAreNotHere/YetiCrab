@@ -1,11 +1,21 @@
+import { IsString, IsNumber, IsObject } from 'class-validator';
+
 export class CreateAttractionDto {
-  name: string;
-  description: string;
-  rating: number;
-  photoUrl: string;
-  location: string;
-  coordinates: {
-    latitude: number;
-    longitude: number;
-  };
+  @IsString()
+  name!: string;
+
+  @IsString()
+  description!: string;
+
+  @IsString()
+  photoUrl?: string; 
+
+  @IsString()
+  location!: string;
+
+  @IsString()
+  latitude!: number;
+
+  @IsString() 
+  longitude!: number;
 }
