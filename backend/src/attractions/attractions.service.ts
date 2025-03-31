@@ -30,6 +30,7 @@ export class AttractionsService {
         mapLink: `https://www.google.com/maps?q=${createAttractionDto.latitude},${createAttractionDto.longitude}`,
         isVisited: false,
         addedAt: new Date(),
+        rating: 0,
       });
 
       const savedAttraction = await this.attractionsRepository.save(attraction);

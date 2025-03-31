@@ -1,5 +1,5 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
-import multer from 'multer'; // Default import
+import multer from 'multer';
 import path from 'path';
 import { join } from 'path';
 
@@ -14,25 +14,34 @@ export class FileUploadMiddleware implements NestMiddleware {
     },
   });
 
-  private upload = multer({ storage: this.storage });
+  private upload = multer({
+    storage: this.storage,
+    fileFilter: (req, file, cb) => {
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+      // if (!allowedTypes.includes(file.mimetype)) {
+      //   return cb(new Error('Invalid file type'), false);
+      // }
+      cb(null, true);
+    },
+  });
 
   use(req: any, res: any, next: () => void) {
-    console.log('FileUploadMiddleware: Starting...'); // Логирование начала
+    console.log('FileUploadMiddleware: Starting...');
 
     try {
       this.upload.single('image')(req, res, (err: any) => {
         if (err instanceof multer.MulterError) {
-          console.error('FileUploadMiddleware: Multer error:', err); // Логирование ошибок Multer
+          console.error('FileUploadMiddleware: Multer error:', err);
           return res.status(400).json({ error: 'File upload failed' });
         } else if (err) {
-          console.error('FileUploadMiddleware: Unknown error:', err); // Логирование других ошибок
+          console.error('FileUploadMiddleware: Unknown error:', err);
           return res.status(500).json({ error: 'Internal server error' });
         }
-        console.log('FileUploadMiddleware: File processed successfully'); // Логирование успешной обработки
-        next(); // Всегда вызываем next(), даже если файл отсутствует
+        console.log('FileUploadMiddleware: File processed successfully');
+        next();
       });
     } catch (error) {
-      console.error('FileUploadMiddleware: Unexpected error:', error); // Логирование неожиданных ошибок
+      console.error('FileUploadMiddleware: Unexpected error:', error);
       res.status(500).json({ error: 'Unexpected error in middleware' });
     }
   }

@@ -13,19 +13,29 @@ import { FileUploadMiddleware } from './file-upload.middleware'; // Импорт
     }),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'uploads'), // Папка для статических файлов
+      serveRoot: '/uploads', // URL-префикс для доступа к файлам
+      serveStaticOptions: {
+        setHeaders: (res, path) => {
+          if (path.endsWith('.jpg') || path.endsWith('.jpeg')) {
+            res.setHeader('Content-Type', 'image/jpeg');
+          } else if (path.endsWith('.png')) {
+            res.setHeader('Content-Type', 'image/png');
+          }
+        },
+      },
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
         type: 'mysql',
-        host: configService.get<string>('DB_HOST'),
+        host: 'localhost',
         port: configService.get<number>('DB_PORT'),
-        username: configService.get<string>('DB_USERNAME'),
-        password: configService.get<string>('DB_PASSWORD'),
-        database: configService.get<string>('DB_NAME'),
+        username: "YouAreNotHere",
+        password: "123456",
+        database: 'world',
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
         synchronize: true,
-        logging: true, 
+        logging: true,
       }),
       inject: [ConfigService],
     }),
@@ -33,11 +43,9 @@ import { FileUploadMiddleware } from './file-upload.middleware'; // Импорт
   ],
 })
 export class AppModule {
-  // configure(consumer: MiddlewareConsumer) {
-  //   console.log("app mod!")
-  //   consumer
-  //     .apply(FileUploadMiddleware) // Применяем мидлвар
-  //     .forRoutes({ path: 'attractions', method: RequestMethod.POST }); // Только для POST /attractions
-  //   console.log("app mod2!")
-  // }
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(FileUploadMiddleware) // Применяем мидлвар
+      .forRoutes({ path: 'attractions', method: RequestMethod.POST }); // Только для POST /attractions
+  }
 }

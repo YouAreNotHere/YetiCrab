@@ -6,14 +6,13 @@ import {
   Param,
   Put,
   Delete,
-  UseInterceptors, 
+  UseInterceptors,
   UploadedFile,
 } from '@nestjs/common';
 import { AttractionsService } from './attractions.service';
 import { CreateAttractionDto } from './create-attraction.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { Express } from 'express'; 
-
+import { Express } from 'express';
 
 @Controller('attractions')
 export class AttractionsController {
@@ -21,7 +20,6 @@ export class AttractionsController {
 
   @Get()
   async findAll() {
-    console.log("get11122")
     return await this.attractionsService.findAll();
   }
 
@@ -31,6 +29,7 @@ export class AttractionsController {
   }
 
   @Post()
+  @UseInterceptors(FileInterceptor('image'))
   async create(
     @Body('name') name: string,
     @Body('description') description: string,
@@ -40,12 +39,9 @@ export class AttractionsController {
     @Body('photoUrl') photoUrl: string,
     @UploadedFile() file: Express.Multer.File,
   ) {
-    console.log('AttractionsController: Starting request processing...'); // Логирование начала
+    console.log('AttractionsController: Starting request processing...');
 
     try {
-      console.log('AttractionsController: Received fields:', { name, description, location, latitude, longitude, photoUrl });
-      console.log('AttractionsController: Uploaded file:', file);
-
       const createAttractionDto = {
         name,
         description,
@@ -62,14 +58,13 @@ export class AttractionsController {
       console.log('AttractionsController: DTO created:', createAttractionDto);
 
       const result = await this.attractionsService.create(createAttractionDto);
-      console.log('AttractionsController: Request completed successfully'); // Логирование завершения
+      console.log('AttractionsController: Request completed successfully');
       return result;
     } catch (error) {
-      console.error('AttractionsController: Error occurred:', error); // Логирование ошибок
-      throw error; // Передаём ошибку дальше
+      console.error('AttractionsController: Error occurred:', error);
+      throw error;
     }
   }
-
 
   @Put(':id')
   async update(
@@ -81,6 +76,6 @@ export class AttractionsController {
 
   @Delete(':id')
   async remove(@Param('id') id: string): Promise<void> {
-    this.attractionsService.remove(id);
+    await this.attractionsService.remove(id);
   }
 }

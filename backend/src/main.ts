@@ -10,13 +10,12 @@ async function bootstrap() {
   // Глобальное логирование HTTP-запросов
   app.use(morgan('dev'));
 
-  // Включение глобальной валидации
+  // // Включение глобальной валидации
   app.useGlobalPipes(new ValidationPipe());
 
   // Настройка CORS
   app.enableCors({
-    // origin: ['http://localhost:5173'],
-    origin: '*',
+    origin: ['http://localhost:5173'],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true, // Поддержка cookies и авторизации
