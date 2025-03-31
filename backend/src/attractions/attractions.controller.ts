@@ -31,33 +31,43 @@ export class AttractionsController {
   }
 
   @Post()
-  @UseInterceptors(FileInterceptor('image'))
   async create(
     @Body('name') name: string,
     @Body('description') description: string,
     @Body('location') location: string,
     @Body('latitude') latitude: string,
     @Body('longitude') longitude: string,
-    @Body('photoUrl') photoUrl: string, // Опциональное поле
+    @Body('photoUrl') photoUrl: string,
     @UploadedFile() file: Express.Multer.File,
   ) {
-    console.log('Received fields:', { name, description, location, latitude, longitude, photoUrl });
-    console.log('Uploaded File:', file);
-  
-    const createAttractionDto: CreateAttractionDto = {
-      name,
-      description,
-      location,
-      latitude: parseFloat(latitude),
-      longitude: parseFloat(longitude),
-      photoUrl: photoUrl || undefined,
-    };
-  
-    if (file) {
-      createAttractionDto.photoUrl = `/uploads/${file.originalname}`;
+    console.log('AttractionsController: Starting request processing...'); // Логирование начала
+
+    try {
+      console.log('AttractionsController: Received fields:', { name, description, location, latitude, longitude, photoUrl });
+      console.log('AttractionsController: Uploaded file:', file);
+
+      const createAttractionDto = {
+        name,
+        description,
+        location,
+        latitude: parseFloat(latitude),
+        longitude: parseFloat(longitude),
+        photoUrl: photoUrl || undefined,
+      };
+
+      if (file) {
+        createAttractionDto.photoUrl = `/uploads/${file.filename}`;
+      }
+
+      console.log('AttractionsController: DTO created:', createAttractionDto);
+
+      const result = await this.attractionsService.create(createAttractionDto);
+      console.log('AttractionsController: Request completed successfully'); // Логирование завершения
+      return result;
+    } catch (error) {
+      console.error('AttractionsController: Error occurred:', error); // Логирование ошибок
+      throw error; // Передаём ошибку дальше
     }
-  
-    return await this.attractionsService.create(createAttractionDto);
   }
 
 

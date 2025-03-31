@@ -20,15 +20,25 @@ export class AttractionsService {
   }
 
   async create(createAttractionDto: CreateAttractionDto): Promise<Attraction> {
-    console.log("create")
-    const attraction = this.attractionsRepository.create({
-      ...createAttractionDto,
-      mapLink: `https://www.google.com/maps?q=${createAttractionDto.latitude},${createAttractionDto.longitude}`,
-      isVisited: false,
-      addedAt: new Date(),
-      rating: 0,
-    });
-    return this.attractionsRepository.save(attraction);
+    console.log('AttractionsService: Starting to create attraction...'); // Логирование начала
+
+    try {
+      console.log('AttractionsService: DTO received:', createAttractionDto);
+
+      const attraction = this.attractionsRepository.create({
+        ...createAttractionDto,
+        mapLink: `https://www.google.com/maps?q=${createAttractionDto.latitude},${createAttractionDto.longitude}`,
+        isVisited: false,
+        addedAt: new Date(),
+      });
+
+      const savedAttraction = await this.attractionsRepository.save(attraction);
+      console.log('AttractionsService: Attraction created and saved:', savedAttraction); // Логирование завершения
+      return savedAttraction;
+    } catch (error) {
+      console.error('AttractionsService: Error occurred:', error); // Логирование ошибок
+      throw error; // Передаём ошибку дальше
+    }
   }
 
   async update(id: string, updateAttractionDto: Partial<CreateAttractionDto>): Promise<Attraction | null> {
