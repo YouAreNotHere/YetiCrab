@@ -8,7 +8,7 @@ export class CreateAttractionDto {
   description!: string;
 
   @IsString()
-  photoUrl?: string; 
+  photoUrl?: string | undefined; 
 
   @IsString()
   location!: string;

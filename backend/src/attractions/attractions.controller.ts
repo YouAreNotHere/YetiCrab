@@ -13,6 +13,8 @@ import { AttractionsService } from './attractions.service';
 import { CreateAttractionDto } from './create-attraction.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Express } from 'express';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
 
 @Controller('attractions')
 export class AttractionsController {
@@ -29,19 +31,35 @@ export class AttractionsController {
   }
 
   @Post()
-  @UseInterceptors(FileInterceptor('image'))
+  @UseInterceptors(
+    FileInterceptor('image', {
+      storage: diskStorage({
+        destination: './uploads', // Папка для сохранения файлов
+        filename: (req, file, callback) => {
+          const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+          const ext = extname(file.originalname);
+          callback(null, `${file.fieldname}-${uniqueSuffix}${ext}`);
+        },
+      }),
+      fileFilter: (req, file, callback) => {
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+        if (!allowedTypes.includes(file.mimetype)) {
+          return callback(new Error('Invalid file type'), false);
+        }
+        callback(null, true);
+      },
+    })
+  )
   async create(
-    @Body('name') name: string,
-    @Body('description') description: string,
-    @Body('location') location: string,
-    @Body('latitude') latitude: string,
-    @Body('longitude') longitude: string,
-    @Body('photoUrl') photoUrl: string,
+    @Body() body: any,
     @UploadedFile() file: Express.Multer.File,
   ) {
     console.log('AttractionsController: Starting request processing...');
-
+    console.log('Uploaded file:', file);
+  
     try {
+      const { name, description, location, latitude, longitude, photoUrl } = body;
+  
       const createAttractionDto = {
         name,
         description,
@@ -50,13 +68,13 @@ export class AttractionsController {
         longitude: parseFloat(longitude),
         photoUrl: photoUrl || undefined,
       };
-
+  
       if (file) {
         createAttractionDto.photoUrl = `/uploads/${file.filename}`;
       }
-
+  
       console.log('AttractionsController: DTO created:', createAttractionDto);
-
+  
       const result = await this.attractionsService.create(createAttractionDto);
       console.log('AttractionsController: Request completed successfully');
       return result;

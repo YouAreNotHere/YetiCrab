@@ -44,8 +44,8 @@ import { FileUploadMiddleware } from './file-upload.middleware'; // Импорт
 })
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(FileUploadMiddleware) // Применяем мидлвар
-      .forRoutes({ path: 'attractions', method: RequestMethod.POST }); // Только для POST /attractions
+    // consumer
+    //   .apply(FileUploadMiddleware) // Применяем мидлвар
+    //   .forRoutes({ path: 'attractions', method: RequestMethod.POST }); // Только для POST /attractions
   }
 }
