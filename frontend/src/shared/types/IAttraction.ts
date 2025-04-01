@@ -3,11 +3,19 @@ export interface IAttraction {
   name: string;
   description: string;
   addedAt: Date;
-  rating: number;
+  rating: number[];
   photoUrl: string;
   location: string;
   latitude: number;
   longitude: number;
   mapLink: string;
-  isVisites: boolean;
+  isVisited: boolean;
+}
+
+export interface IUpdatedAttraction extends Omit<IAttraction, 'id' | 'addedAt' | 'rating' | 'latitude' | 'longitude'> {
+  id?: string;
+  addedAt?: Date;
+  rating?: number[];
+  latitude?: number;
+  longitude?: number;
 }

@@ -1,26 +1,41 @@
 import {useState} from "react";
 import {useRequest} from "../../shared/hooks/useRequest.ts";
-import "./AddAttractionModal.scss"
+import {IAttraction, IUpdatedAttraction} from "../../shared/types/IAttraction.ts";
+import "./AttractionModal.scss"
 
 interface Props {
-    getAttractions: (attraction: string) => void;
+    getAttractions?: (attraction: string) => void;
+    attraction?: IUpdatedAttraction;
+    attractions: IAttraction[];
     setIsModalOpen: (isOpen: boolean) => void;
     isModalOpen: boolean;
+    setAttractions: React.Dispatch<React.SetStateAction<IAttraction[]>>;
 }
 
-const AddAttractionModal = ({setIsModalOpen, isModalOpen, getAttractions}: Props) => {
-    const [name, setName] = useState("");
-    const [description, setDescription] = useState("");
-    // const [preview, setPreview] = useState<string | ArrayBuffer | null>("");
-    const [preview, setPreview] = useState<string | null | any>("");
+const emptyAttraction = {
+    id: "",
+    name: "",
+    description: "",
+    photoUrl: "",
+    location: "",
+    mapLink: "",
+    isVisited: false,
+}
+
+const AttractionModal = ({setIsModalOpen, isModalOpen, getAttractions, attraction = emptyAttraction, setAttractions, attractions}: Props) => {
+    const [name, setName] = useState(attraction.name);
+    const [description, setDescription] = useState(attraction.description);
+    const [preview, setPreview] = useState<string | null | any>(attraction?.photoUrl);
     const [image, setImage] = useState<File | null>(null);
-    const [photoUrl, setPhotoURL] = useState("");
-    const [location, setLocation] = useState("");
+    const [photoUrl, setPhotoURL] = useState(attraction?.photoUrl);
+    const [location, setLocation] = useState(attraction?.location);
     const [latitude, setLatitude] = useState("");
     const [longitude, setLongitude] = useState("");
+    console.log(attractions);
 
 
-    const {makeRequest} = useRequest({method: "POST", url: "attractions", onSuccess: getAttractions});
+    const {makeRequest: createAttraction} = useRequest({method: "POST", url: "attractions", onSuccess: getAttractions});
+    const {makeRequest: updateAttraction} = useRequest({method: "PUT", url: `attractions/${attraction.id}`});
 
     const onSubmitHandler = () => {
         const formData = new FormData();
@@ -36,7 +51,19 @@ const AddAttractionModal = ({setIsModalOpen, isModalOpen, getAttractions}: Props
         for (let [key, value] of formData.entries()) {
             console.log(key, value);
         }
-        makeRequest(formData);
+        if (attraction.id){
+            updateAttraction(formData);
+            setAttractions(attractions.map(item =>(
+                attraction.id === item.id ? item : {
+                    ...item, name, description, photoUrl, location, latitude: Number(latitude), longitude: Number(longitude)}
+            )));
+        }else{
+            createAttraction(formData);
+        }
+
+        console.log("zzz")
+        setIsModalOpen(false);
+
     }
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -81,9 +108,9 @@ const AddAttractionModal = ({setIsModalOpen, isModalOpen, getAttractions}: Props
                 />
                 {preview && (
                     <img
-                        src={preview}
-                        alt="Предпросмотр"
-                        style={{ maxWidth: "200px", marginTop: "10px" }}
+                        src={preview.startsWith("http") ? preview : `http://localhost:8081${preview}`}
+                        alt={name}
+                        className="custom-image"
                     />
                 )}
             </div>
@@ -103,10 +130,10 @@ const AddAttractionModal = ({setIsModalOpen, isModalOpen, getAttractions}: Props
                 onChange={(e) => setLongitude(e.target.value)}
             />
             <button onClick={onSubmitHandler}>
-                Добавить достопримечательность
+                Подтвердить
             </button>
         </div>
     )
 }
 
-export default AddAttractionModal;
+export default AttractionModal;

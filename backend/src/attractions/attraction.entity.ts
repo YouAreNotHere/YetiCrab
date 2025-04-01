@@ -14,8 +14,8 @@ export class Attraction {
     @CreateDateColumn()
     addedAt!: Date;
 
-    @Column({ type: 'decimal', precision: 3, scale: 1 })
-    rating!: number;
+    @Column('json')
+    rating!: number[];
 
     @Column()
     photoUrl!: string;

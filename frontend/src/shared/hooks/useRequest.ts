@@ -49,11 +49,18 @@ const useRequest = (props: IUseRequestProps) => {
         });
       } else if (method === 'DELETE') {
         response = await fetch(`${urlAdress}${url}`, {
-          method: 'DELETE',
+          method,
           headers: {'Content-Type': 'application/json'},
           credentials: 'include',
         });
+      } else if (method === 'PUT') {
+        response = await fetch(`${urlAdress}${url}`, {
+          method,
+          body: innerBody,
+          credentials: 'include',
+        });
       }
+
 
       if (response.ok) {
         const data = await response.json();

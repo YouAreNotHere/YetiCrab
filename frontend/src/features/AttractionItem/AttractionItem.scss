@@ -2,3 +2,11 @@
   display: flex;
   flex-direction: column;
 }
+
+.rating-button-wrapper__button--selected{
+  opacity: 1;
+}
+
+.rating-button-wrapper__button--unselected{
+  opacity: 0.4;
+}

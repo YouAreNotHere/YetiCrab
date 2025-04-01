@@ -1,7 +1,7 @@
 import { useRequest } from "../../shared/hooks/useRequest.ts";
 import {IAttraction} from "../../shared/types/IAttraction.ts"
 import AttractionItem from "../AttractionItem/AttractionItem.tsx";
-import AddAttractionModal from "../AddAttractionModal/AddAttractionModal.tsx";
+import AttractionModal from "../AttractionModal/AttractionModal.tsx";
 import { useState, useEffect } from 'react'
 
 const AttractionsList = () => {
@@ -20,12 +20,18 @@ const AttractionsList = () => {
 
     if (isLoading || !data) return <p>Loading...</p>;
     console.log(data)
+    const visitedAttractions = attractions.filter(attraction => attraction.isVisited);
+    console.log(attractions)
     return(
         <section>
             <h1>
                 Достопримечательности
             </h1>
-            <AddAttractionModal
+            <p>Всего достопримечательностей: {attractions.length}</p>
+            <p>Из них посетили: {visitedAttractions.length}</p>
+            <AttractionModal
+                setAttractions={setAttractions}
+                attractions={attractions}
                 getAttractions={makeRequest}
                 setIsModalOpen={setIsAddAttractionModalOpen}
                 isModalOpen={isAddAttractionModalOpen}/>
@@ -37,8 +43,8 @@ const AttractionsList = () => {
             {!!data.length ? (
                 <ul>
                     {attractions.map((attraction) => (
-                        <li>
-                            <AttractionItem attraction={attraction}/>
+                        <li key={attraction.id}>
+                            <AttractionItem attraction={attraction} setAttractions={setAttractions}/>
                         </li>
                     ))}
                 </ul>
