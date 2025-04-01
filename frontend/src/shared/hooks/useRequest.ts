@@ -38,8 +38,7 @@ const useRequest = (props: IUseRequestProps) => {
           body: innerBody,
           credentials: 'include',
         });
-      } else {
-        console.log("get")
+      } else if (method === 'GET') {
         response = await fetch(`${urlAdress}${url}`, {
           method,
           ...params,
@@ -47,6 +46,12 @@ const useRequest = (props: IUseRequestProps) => {
           headers: {
             'Content-Type': 'application/json',
           },
+        });
+      } else if (method === 'DELETE') {
+        response = await fetch(`${urlAdress}${url}`, {
+          method: 'DELETE',
+          headers: {'Content-Type': 'application/json'},
+          credentials: 'include',
         });
       }
 

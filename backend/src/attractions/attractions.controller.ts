@@ -94,6 +94,8 @@ export class AttractionsController {
 
   @Delete(':id')
   async remove(@Param('id') id: string): Promise<void> {
+    console.log("delete")
+    console.log(id);
     await this.attractionsService.remove(id);
   }
 }
