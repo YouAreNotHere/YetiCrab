@@ -1,3 +1,9 @@
+.attractions-form{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 .attractions-table {
   display: flex;
   flex-direction: column;
@@ -10,10 +16,6 @@
   background-color: #f5f5f5;
   border-bottom: 1px solid #ccc;
   justify-content: space-between;
-}
-
-.table-headers{
-//
 }
 
 .table-headers__title{
@@ -48,3 +50,11 @@
   width: 10%;
 }
 
+.filter-buttons{
+  display: flex;
+  flex-direction: column;
+  width: 250px;
+  align-self: center;
+  gap: 5px;
+  margin-bottom: 20px;
+}

@@ -42,3 +42,14 @@
 .read-the-docs {
   color: #888;
 }
+
+.admin-button{
+  align-self: end;
+  justify-self: end;
+  display: flex;
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  width: 250px;
+}

@@ -1,4 +1,4 @@
-.add-attraction-modal {
+.attraction-modal__content {
   width: 400px;
   display: flex;
   flex-direction: column;
@@ -6,23 +6,26 @@
   gap: 15px;
 }
 
-.add-attraction-modal--hidden{
+.attraction-modal--hidden{
   display: none;
 }
 
-.attractions-table {
+.attraction-modal__pictures{
   display: flex;
+  gap: 15px;
   flex-direction: column;
+
+  p{
+    margin: 0;
+    font-weight: bold;
+  }
 }
 
-.table-headers {
+.attraction-modal__buttons-wrapper{
   display: flex;
-  align-items: center;
-  padding: 8px 16px;
-  background-color: #f5f5f5;
-  border-bottom: 1px solid #ccc;
+  justify-content: space-between;
 }
 
-.table-headers{
-
+.attraction-modal__inner-wrapper{
+  display: flex;
 }

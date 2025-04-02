@@ -11,6 +11,7 @@ function App() {
     const [attractions, setAttractions] = useState<IAttraction[]>([]);
     const [currentAttractions, setCurrentAttractions] = useState<IAttraction[]>([])
     const [isAddAttractionModalOpen, setIsAddAttractionModalOpen] = useState(false);
+    const [isAdminMode, setIsAdminMode] = useState(true);
     const { data, makeRequest } = useRequest({ method: "GET", url: "attractions" });
 
     useEffect(() => {
@@ -25,6 +26,23 @@ function App() {
   return (
     <>
         <ThemeProvider theme="light">
+            <div className = "admin-button">
+                <Button
+                    view="outlined-info"
+                    onClick={() => setIsAdminMode(!isAdminMode)}
+                >
+                    Режим администратора
+                </Button>
+                <Button
+                    view = "action"
+                    onClick={() => setIsAddAttractionModalOpen(!isAddAttractionModalOpen)}
+                    className="add-attraction__button"
+                    style = {isAdminMode ? {display: "flex"} : {display: "none"}}
+                >
+                    Добавить достопримечательность
+                </Button>
+            </div>
+
             <SearchInput
                 attractions={attractions}
                 setCurrentAttraction={setCurrentAttractions}/>
@@ -34,17 +52,12 @@ function App() {
                 setIsModalOpen={setIsAddAttractionModalOpen}
                 isModalOpen={isAddAttractionModalOpen}
             />
-            <Button
-                view = "action"
-                onClick={() => setIsAddAttractionModalOpen(!isAddAttractionModalOpen)}
-                className="add-attraction__button"
-            >
-                Добавить достопримечательность
-            </Button>
             <AttractionsList
                 attractions={attractions}
                 setAttractions={setAttractions}
-                currentAttractions={currentAttractions}/>
+                currentAttractions={currentAttractions}
+                isAdminMode={isAdminMode}
+            />
         </ThemeProvider>
     </>
   )

@@ -1,33 +1,56 @@
-import {useState, useEffect} from "react";
-import {IAttraction} from "../../shared/types/IAttraction.ts";
+import React, { useState, useEffect, useCallback } from "react";
+import { TextInput } from "@gravity-ui/uikit";
+import { IAttraction } from "../../shared/types/IAttraction.ts";
+import "./SearchInput.scss"
 
-interface Props{
+interface Props {
     attractions: IAttraction[];
     setCurrentAttraction: React.Dispatch<React.SetStateAction<IAttraction[]>>;
 }
 
-const SearchInput = ({attractions, setCurrentAttraction}: Props) => {
-    const [text, setText] = useState('');
-    if (text === "") setCurrentAttraction(attractions);
-    let regText : RegExp;
-    if (!!text) regText = new RegExp(`^${text}+`,"i");
-    let likelyTodos: IAttraction[] = attractions?.filter((item: IAttraction) => regText?.test(item.name));
+const SearchInput = ({ attractions, setCurrentAttraction }: Props) => {
+    const [text, setText] = useState("");
+
+    const filterAttractions = useCallback(
+        (searchText: string) => {
+            if (!attractions) return;
+
+            if (searchText === "") {
+                setCurrentAttraction(attractions);
+                return;
+            }
+
+            const escapedText = searchText.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+            const regExp = new RegExp(`^${escapedText}`, "i");
+            const filtered = attractions.filter((item) => regExp.test(item.name));
+            setCurrentAttraction(filtered);
+        },
+        [attractions, setCurrentAttraction]
+    );
 
     useEffect(() => {
-        likelyTodos = attractions?.filter((item: IAttraction) => regText?.test(item.name))
-        if (likelyTodos) setCurrentAttraction(likelyTodos);
-    }, [text]);
+        if (text === "") {
+            filterAttractions("");
+            return;
+        }
 
+        const debounceTimer = setTimeout(() => {
+            filterAttractions(text);
+        }, 500);
 
-    return(
-        <div className="suggest-input-and-list__wrapper">
-            <input
-                className="suggest-todo__input"
-                onChange={(e) => setText(e.target.value)}
+        return () => clearTimeout(debounceTimer); // Очистка таймера при каждом изменении text
+    }, [text, filterAttractions]);
+
+    return (
+        <div className="search-input">
+            <TextInput
+                placeholder="Поиск"
                 value={text}
-                placeholder="Поиск" />
+                onUpdate={(value) => setText(value)}
+                size="m"
+            />
         </div>
-    )
+    );
 };
 
 export default SearchInput;
