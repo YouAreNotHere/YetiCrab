@@ -20,7 +20,10 @@ interface Props {
 const AttractionItem = ({ attraction, setAttractions, attractions }: Props) => {
     const { id, name, description, rating: ratingArray, photoUrl, location, addedAt, mapLink, isVisited } = attraction;
     const {makeRequest: deleteItem} = useRequest({method:"DELETE", url:`attractions/${id}`});
+    console.log("attractions")
     console.log(attractions)
+    console.log("attraction")
+    console.log(attraction)
 
     const [currentRating, setCurrentRating] = useState(0);
     const [focusedRating, setFocusedRating] = useState<number>(0);
@@ -89,6 +92,7 @@ const AttractionItem = ({ attraction, setAttractions, attractions }: Props) => {
             <div className={"rating-button-wrapper"}>
                 {ratingValues.map((value) => (
                     <Button
+                        key={value}
                         onClick={() => onRatingButtonClick(value)}
                         onMouseEnter={() => setFocusedRating(value)}
                         onMouseLeave={() => {

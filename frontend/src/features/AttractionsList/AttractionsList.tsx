@@ -3,6 +3,7 @@ import {IAttraction} from "../../shared/types/IAttraction.ts"
 import AttractionItem from "../AttractionItem/AttractionItem.tsx";
 import AttractionModal from "../AttractionModal/AttractionModal.tsx";
 import { useState, useEffect } from 'react'
+import { Table, Button, Text } from '@gravity-ui/uikit';
 
 const AttractionsList = () => {
     const [attractions, setAttractions] = useState<IAttraction[]>([]);
@@ -31,7 +32,6 @@ const AttractionsList = () => {
             <p>Из них посетили: {visitedAttractions.length}</p>
             <AttractionModal
                 setAttractions={setAttractions}
-                attractions={attractions}
                 getAttractions={makeRequest}
                 setIsModalOpen={setIsAddAttractionModalOpen}
                 isModalOpen={isAddAttractionModalOpen}/>
@@ -44,7 +44,7 @@ const AttractionsList = () => {
                 <ul>
                     {attractions.map((attraction) => (
                         <li key={attraction.id}>
-                            <AttractionItem attraction={attraction} setAttractions={setAttractions}/>
+                            <AttractionItem attraction={attraction} setAttractions={setAttractions} attractions={attractions}/>
                         </li>
                     ))}
                 </ul>

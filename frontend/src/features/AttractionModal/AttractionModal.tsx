@@ -6,7 +6,7 @@ import "./AttractionModal.scss"
 interface Props {
     getAttractions?: (attraction: string) => void;
     attraction?: IUpdatedAttraction;
-    attractions: IAttraction[];
+    attractions?: IAttraction[];
     setIsModalOpen: (isOpen: boolean) => void;
     isModalOpen: boolean;
     setAttractions: React.Dispatch<React.SetStateAction<IAttraction[]>>;
@@ -31,8 +31,7 @@ const AttractionModal = ({setIsModalOpen, isModalOpen, getAttractions, attractio
     const [location, setLocation] = useState(attraction?.location);
     const [latitude, setLatitude] = useState("");
     const [longitude, setLongitude] = useState("");
-    console.log(attractions);
-
+    // console.log(attractions);
 
     const {makeRequest: createAttraction} = useRequest({method: "POST", url: "attractions", onSuccess: getAttractions});
     const {makeRequest: updateAttraction} = useRequest({method: "PUT", url: `attractions/${attraction.id}`});
@@ -51,7 +50,7 @@ const AttractionModal = ({setIsModalOpen, isModalOpen, getAttractions, attractio
         for (let [key, value] of formData.entries()) {
             console.log(key, value);
         }
-        if (attraction.id){
+        if (attraction.id && attractions){
             updateAttraction(formData);
             setAttractions(attractions.map(item =>(
                 attraction.id === item.id ? item : {
@@ -61,7 +60,7 @@ const AttractionModal = ({setIsModalOpen, isModalOpen, getAttractions, attractio
             createAttraction(formData);
         }
 
-        console.log("zzz")
+        // console.log("zzz")
         setIsModalOpen(false);
 
     }
