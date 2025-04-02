@@ -1,6 +1,71 @@
-.attraction-item{
+.attraction-item {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  border-bottom: 1px solid #ccc;
+}
+
+.attraction-item-row:last-child {
+  border-bottom: none;
+}
+
+.rating-buttons {
+  display: flex;
+  gap: 4px;
+
+  button{
+    padding: 0;
+  }
+}
+
+.rating-buttons__button--unselected{
+  opacity: 0.4;
+}
+
+.attraction-item__name,
+.attraction-item__addedAt,
+.attraction-item__location,
+.attraction-item__action-buttons{
+  width: 10%;
+}
+
+.attraction-item__description{
+  width: 20%;
+}
+
+.attraction-item__image{
+  width: 20%;
+  height: auto;
+}
+
+.attraction-item__rating{
+  width: 15%;
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+}
+
+//.attraction-item__isVisited--true,
+//.attraction-item__isVisited--false,{
+//  width: 5%;
+//  border-radius: 10px;
+//  color: white !important;
+//}
+
+.attraction-item__isVisited{
+  width: 5%;
+  border-radius: 10px;
+  color: white !important;
+}
+
+.attraction-item__isVisited.true{
+  background-color: #57e038 !important;
+}
+
+.attraction-item__isVisited.false{
+  background-color: #f00a15 !important;
 }
 
 .rating-button-wrapper__button--selected{
@@ -10,3 +75,4 @@
 .rating-button-wrapper__button--unselected{
   opacity: 0.4;
 }
+

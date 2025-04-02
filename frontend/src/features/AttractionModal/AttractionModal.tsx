@@ -60,7 +60,6 @@ const AttractionModal = ({setIsModalOpen, isModalOpen, getAttractions, attractio
             createAttraction(formData);
         }
 
-        // console.log("zzz")
         setIsModalOpen(false);
 
     }
