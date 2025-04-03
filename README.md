@@ -3,52 +3,35 @@
 ## Overview
 This is a full-stack application for managing tourist attractions. The backend is built with NestJS, and the frontend uses React. The database is MySQL. The application allows users to create, update, delete, and view attractions, including their details such as location, rating, and images.
 
----
 
 ## Table of Contents
 1. [Prerequisites](#prerequisites)
 2. [Installation](#installation)
 3. [Running the Application](#running-the-application)
 4. [REST API Documentation](#rest-api-documentation)
-5. [Additional Notes](#additional-notes)
 
----
 
 ## Prerequisites
 Before running the project, ensure you have the following installed:
 - Docker: [Install Docker](https://docs.docker.com/get-docker/)
 - Docker Compose: [Install Docker Compose](https://docs.docker.com/compose/install/)
 
----
 
 ## Installation
 
 1. **Clone the repository:**
-   git clone https://github.com/yourusername/your-repo.git
+   git clone https://github.com/YouAreNotHere/YetiCrab.git
    cd your-repo
 
-2. **Create .env files**
-   Frontend (.env in frontend folder):
-
-   VITE_REACT_APP_API_URL_DEV=http://localhost:8081/
-   VITE_REACT_APP_API_URL_PROD=https://your-production-api-url.com
-   VITE_GOOGLE_MAPS_API_KEY=your_google_maps_api_key_here  
-
-   Backend (.env in backend folder):
-   MYSQL_ROOT_PASSWORD=123456
-   MYSQL_DATABASE=test_db
-   MYSQL_USER=YouAreNotHere
-   MYSQL_PASSWORD=123456
-   DB_HOST=db
-   DB_PORT=3306
-   DB_USERNAME=YouAreNotHere
-   DB_PASSWORD=123456
-   DB_NAME=test_db
-
-3. **Start docker**
-   docker-compose up --build
-
    
+
+2. **Start docker**
+  - type "docker exec -it db bash"
+  - type "mysql -u YouAreNotHere -p" (password 123456)
+  - type "create database if not exists <DB_NAME>" (DB_NAME has in docker-compose.yaml -> services.db.environment.MYSQL_DATABASE)
+  - docker-compose down
+  - docker-compose up -d
+
 
 ## Running the Application
 

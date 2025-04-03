@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
-import { Modal, Button, TextInput, TextArea } from '@gravity-ui/uikit';
+import { Modal, Button, TextInput, TextArea, Text } from '@gravity-ui/uikit';
 import { useRequest } from '../../shared/hooks/useRequest.ts';
 import {
   IAttraction,
@@ -47,6 +47,7 @@ const AttractionModal = ({
   const isButtonDisabled = useMemo(() => {
     return (
       !name ||
+      name.length > 15 ||
       !description ||
       !location ||
       !latitude ||
@@ -169,6 +170,9 @@ const AttractionModal = ({
           value={name}
           onUpdate={(value) => setName(value)}
         />
+        {name.length > 15 && (
+          <Text variant='body-2'>Название слишком длинное</Text>
+        )}
         <TextArea
           placeholder="Описание"
           value={description}

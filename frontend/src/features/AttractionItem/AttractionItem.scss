@@ -59,6 +59,9 @@
 
 .attraction-item__description {
   width: 20%;
+  word-wrap: break-word;    
+  overflow-wrap: break-word; 
+  white-space: normal;  
 }
 
 .attraction-item__image {

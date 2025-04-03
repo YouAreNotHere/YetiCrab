@@ -7,10 +7,10 @@ export default defineConfig({
     include: ['react/jsx-runtime'],
   },
   plugins: [react()],
-  // server: {
-  //   watch: {
-  //     usePolling: true,
-  //     interval: 1000,
-  //   },
-  // },
+  server: {
+    watch: {
+      usePolling: true,
+      interval: 1000,
+    },
+  },
 });
