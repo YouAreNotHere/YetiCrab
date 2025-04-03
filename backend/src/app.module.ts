@@ -1,10 +1,10 @@
-import { Module, MiddlewareConsumer, RequestMethod } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AttractionsModule } from './attractions/attractions.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
-import { FileUploadMiddleware } from './file-upload.middleware'; // Импортируем мидлвар
+import { Response } from 'express'; // Импортируем тип Response
 
 @Module({
   imports: [
@@ -12,10 +12,10 @@ import { FileUploadMiddleware } from './file-upload.middleware'; // Импорт
       isGlobal: true,
     }),
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'uploads'), // Папка для статических файлов
-      serveRoot: '/uploads', // URL-префикс для доступа к файлам
+      rootPath: join(__dirname, '..', 'uploads'),
+      serveRoot: '/uploads',
       serveStaticOptions: {
-        setHeaders: (res, path) => {
+        setHeaders: (res: Response, path: string) => {
           if (path.endsWith('.jpg') || path.endsWith('.jpeg')) {
             res.setHeader('Content-Type', 'image/jpeg');
           } else if (path.endsWith('.png')) {
@@ -30,8 +30,8 @@ import { FileUploadMiddleware } from './file-upload.middleware'; // Импорт
         type: 'mysql',
         host: 'localhost',
         port: configService.get<number>('DB_PORT'),
-        username: "YouAreNotHere",
-        password: "123456",
+        username: 'YouAreNotHere',
+        password: '123456',
         database: 'world',
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
         synchronize: true,
@@ -42,10 +42,4 @@ import { FileUploadMiddleware } from './file-upload.middleware'; // Импорт
     AttractionsModule,
   ],
 })
-export class AppModule {
-  configure(consumer: MiddlewareConsumer) {
-    // consumer
-    //   .apply(FileUploadMiddleware) // Применяем мидлвар
-    //   .forRoutes({ path: 'attractions', method: RequestMethod.POST }); // Только для POST /attractions
-  }
-}
+export class AppModule {}

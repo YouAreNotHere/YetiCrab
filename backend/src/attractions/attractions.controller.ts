@@ -8,13 +8,36 @@ import {
   Delete,
   UseInterceptors,
   UploadedFile,
+  BadRequestException,
 } from '@nestjs/common';
 import { AttractionsService } from './attractions.service';
-import { CreateAttractionDto } from './create-attraction.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Express } from 'express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
+
+// DTO для создания достопримечательности
+interface CreateAttractionDto {
+  name: string;
+  description: string;
+  location: string;
+  latitude: number;
+  longitude: number;
+  photoUrl?: string;
+}
+
+// DTO для обновления достопримечательности
+interface UpdateAttractionDto {
+  name?: string;
+  description?: string;
+  location?: string;
+  latitude?: number;
+  longitude?: number;
+  photoUrl?: string;
+  rating?: number[];
+  mapLink?: string;
+  isVisited?: boolean;
+}
 
 @Controller('attractions')
 export class AttractionsController {
@@ -32,35 +55,31 @@ export class AttractionsController {
 
   @Post()
   @UseInterceptors(
-    FileInterceptor('image', {
-      storage: diskStorage({
-        destination: './uploads', // Папка для сохранения файлов
-        filename: (req, file, callback) => {
-          const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-          const ext = extname(file.originalname);
-          callback(null, `${file.fieldname}-${uniqueSuffix}${ext}`);
+      FileInterceptor('image', {
+        storage: diskStorage({
+          destination: './uploads',
+          filename: (req, file, callback) => {
+            const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+            const ext = extname(file.originalname);
+            callback(null, `${file.fieldname}-${uniqueSuffix}${ext}`);
+          },
+        }),
+        fileFilter: (req, file, callback) => {
+          const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+          if (!allowedTypes.includes(file.mimetype)) {
+            return callback(new Error('Invalid file type'), false);
+          }
+          callback(null, true);
         },
-      }),
-      fileFilter: (req, file, callback) => {
-        const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
-        if (!allowedTypes.includes(file.mimetype)) {
-          return callback(new Error('Invalid file type'), false);
-        }
-        callback(null, true);
-      },
-    })
+      })
   )
   async create(
-    @Body() body: any,
-    @UploadedFile() file: Express.Multer.File,
+      @Body() body: CreateAttractionDto,
+      @UploadedFile() file: Express.Multer.File
   ) {
-    console.log('AttractionsController: Starting request processing...');
-    console.log('Uploaded file:', file);
-  
     try {
       const { name, description, location, latitude, longitude, photoUrl } = body;
-  
-      const createAttractionDto = {
+      const createAttractionDto: CreateAttractionDto = {
         name,
         description,
         location,
@@ -68,15 +87,10 @@ export class AttractionsController {
         longitude: parseFloat(longitude),
         photoUrl: photoUrl || undefined,
       };
-  
       if (file) {
         createAttractionDto.photoUrl = `/uploads/${file.filename}`;
       }
-  
-      console.log('AttractionsController: DTO created:', createAttractionDto);
-  
       const result = await this.attractionsService.create(createAttractionDto);
-      console.log('AttractionsController: Request completed successfully');
       return result;
     } catch (error) {
       console.error('AttractionsController: Error occurred:', error);
@@ -86,74 +100,73 @@ export class AttractionsController {
 
   @Put(':id')
   @UseInterceptors(
-    FileInterceptor('image', {
-      storage: diskStorage({
-        destination: './uploads',
-        filename: (req, file, callback) => {
-          const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-          const ext = extname(file.originalname);
-          callback(null, `${file.fieldname}-${uniqueSuffix}${ext}`);
+      FileInterceptor('image', {
+        storage: diskStorage({
+          destination: './uploads',
+          filename: (req, file, callback) => {
+            const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+            const ext = extname(file.originalname);
+            callback(null, `${file.fieldname}-${uniqueSuffix}${ext}`);
+          },
+        }),
+        fileFilter: (req, file, callback) => {
+          const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+          if (!allowedTypes.includes(file.mimetype)) {
+            return callback(new Error('Invalid file type'), false);
+          }
+          callback(null, true);
         },
-      }),
-      fileFilter: (req, file, callback) => {
-        const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
-        if (!allowedTypes.includes(file.mimetype)) {
-          return callback(new Error('Invalid file type'), false);
-        }
-        callback(null, true);
-      },
-    })
+      })
   )
   async update(
     @Param('id') id: string,
-    @Body() body: any,
-    @UploadedFile() file: Express.Multer.File,
+    @Body() body: UpdateAttractionDto,
+    @UploadedFile() file: Express.Multer.File
   ) {
     console.log('Updating attraction with ID:', id);
     console.log('Update data:', body);
-  
+
     let rating: number[] = [];
     if (body.rating) {
       try {
-        rating = JSON.parse(body.rating); 
+        rating = JSON.parse(body.rating as string);
       } catch (error) {
         console.error('Failed to parse rating:', error);
-        // throw new BadRequestException('Invalid rating format');
+        throw new BadRequestException('Invalid rating format');
       }
     }
-  
-    const latitude = body.latitude ? parseFloat(body.latitude) : undefined;
-    const longitude = body.longitude ? parseFloat(body.longitude) : undefined;
+
+    const latitude = body.latitude ? parseFloat(body.latitude.toString()) : undefined;
+    const longitude = body.longitude ? parseFloat(body.longitude.toString()) : undefined;
     const isVisited = body.isVisited !== undefined ? Boolean(body.isVisited) : undefined;
-  
+
     if (latitude !== undefined && isNaN(latitude)) {
-      // throw new BadRequestException('Invalid latitude value');
+      throw new BadRequestException('Invalid latitude value');
     }
-  
     if (longitude !== undefined && isNaN(longitude)) {
-      // throw new BadRequestException('Invalid longitude value');
+      throw new BadRequestException('Invalid longitude value');
     }
-  
-    const updateAttractionDto = {
+
+    const updateAttractionDto: UpdateAttractionDto = {
       name: body.name,
       description: body.description,
       location: body.location,
-      latitude, 
-      longitude, 
+      latitude,
+      longitude,
       photoUrl: body.photoUrl || undefined,
       rating,
-      mapLink: `https://www.google.com/maps?q=${latitude},${longitude}`, 
+      mapLink: `https://www.google.com/maps?q=${latitude},${longitude}`,
       isVisited,
     };
-  
+
     if (file) {
       updateAttractionDto.photoUrl = `/uploads/${file.filename}`;
     }
-  
+
     if (!updateAttractionDto || Object.keys(updateAttractionDto).length === 0) {
-      // throw new BadRequestException('Update data is missing or empty');
+      throw new BadRequestException('Update data is missing or empty');
     }
-  
+
     await this.attractionsService.update(id, updateAttractionDto);
     return this.findOne(id);
   }

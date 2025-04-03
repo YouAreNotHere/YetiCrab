@@ -23,7 +23,6 @@ const AttractionsList = ({
         "name-asc" | "name-desc" | "rating-asc" | "rating-desc" | "addedAt-asc" | "addedAt-desc"
     >("name-asc");
     const [showOnlyRated, setShowOnlyRated] = useState(false);
-    const [whichModalOpen, setWhichModalOpen] = useState<null | string>(null);
     const filterOptions = [
             {value: "all", content: "Показать все"},
             {value: "visited", content: "Посещенные"},
@@ -37,7 +36,8 @@ const AttractionsList = ({
         {value: "addedAt-asc", content: "Дата (возрастание)"},
         {value: "addedAt-desc", content: "Дата (убывание)"},
     ]
-
+    type TSort = "name-asc" | "name-desc" | "rating-asc" | "rating-desc" | "addedAt-asc" | "addedAt-desc";
+    type TFilter = "all" | "visited" | "unvisited";
     const calculateAverageRating = (rating: number[]): number => {
         if (!rating || rating.length === 0) return 0;
         const sum = rating.reduce((acc, value) => acc + value, 0);
@@ -84,11 +84,11 @@ const AttractionsList = ({
                 }
                 case "addedAt-asc":
                     result =
-                        new Date(a.addedAt).getTime() - new Date(b.addedAt).getTime(); // По дате добавления (возрастание)
+                        new Date(a.addedAt).getTime() - new Date(b.addedAt).getTime();
                     break;
                 case "addedAt-desc":
                     result =
-                        new Date(b.addedAt).getTime() - new Date(a.addedAt).getTime(); // По дате добавления (убывание)
+                        new Date(b.addedAt).getTime() - new Date(a.addedAt).getTime();
                     break;
                 default:
                     break;
@@ -112,108 +112,16 @@ const AttractionsList = ({
                 </Button>
 
                 <div className="filter-and-sort">
-                    {/*{whichModalOpen === "filter" ?*/}
-                    {/*    <div className="filter-buttons">*/}
-                    {/*    <Button*/}
-                    {/*        view={visibleAttractionsFilter === "all" ? "action" : "outlined"}*/}
-                    {/*        onClick={() => {*/}
-                    {/*            setWhichModalOpen(null)*/}
-                    {/*            setVisibleAttractionsFilter("all")}*/}
-                    {/*        }*/}
-                    {/*    >*/}
-                    {/*        Показать все*/}
-                    {/*    </Button>*/}
-                    {/*    <Button*/}
-                    {/*        view={visibleAttractionsFilter === "visited" ? "action" : "outlined"}*/}
-                    {/*        onClick={() => {*/}
-                    {/*            setWhichModalOpen(null)*/}
-                    {/*            setVisibleAttractionsFilter("visited")}*/}
-                    {/*        }*/}
-                    {/*    >*/}
-                    {/*        Посещенным*/}
-                    {/*    </Button>*/}
-                    {/*    <Button*/}
-                    {/*        view={visibleAttractionsFilter === "unvisited" ? "action" : "outlined"}*/}
-                    {/*        onClick={() => {*/}
-                    {/*            setWhichModalOpen(null)*/}
-                    {/*            setVisibleAttractionsFilter("unvisited")}*/}
-                    {/*        }*/}
-                    {/*    >*/}
-                    {/*        Непосещенным*/}
-                    {/*    </Button>*/}
-                    {/*</div>*/}
-                        {/*:*/}
                     <Select
                             placeholder='Фильтровать по'
                             options={filterOptions}
                             onUpdate={(value) => setVisibleAttractionsFilter(value[0] as TFilter)}
                         />
-                {/*}*/}
-
-                    {whichModalOpen === "sort" ?
-                        <div className="sort-buttons">
-                            <Button
-                                view={sortedBy === "name-asc" ? "action" : "outlined"}
-                                onClick={() => {
-                                    setWhichModalOpen(null)
-                                    setSortedBy("name-asc")}
-                                }
-                            >
-                                Имя (возрастание)
-                            </Button>
-                            <Button
-                                view={sortedBy === "name-desc" ? "action" : "outlined"}
-                                onClick={() => {
-                                    setWhichModalOpen(null)
-                                    setSortedBy("name-desc")}
-                                }
-                            >
-                                Имя (убывание)
-                            </Button>
-                            <Button
-                                view={sortedBy === "rating-asc" ? "action" : "outlined"}
-                                onClick={() => {
-                                    setWhichModalOpen(null)
-                                    setSortedBy("rating-asc")}
-                                }
-                            >
-                                Рейтинг (возрастание)
-                            </Button>
-                            <Button
-                                view={sortedBy === "rating-desc" ? "action" : "outlined"}
-                                onClick={() => {
-                                    setWhichModalOpen(null)
-                                    setSortedBy("rating-desc")}
-                                }
-                            >
-                                Рейтинг (убывание)
-                            </Button>
-                            <Button
-                                view={sortedBy === "addedAt-asc" ? "action" : "outlined"}
-                                onClick={() => {
-                                    setWhichModalOpen(null)
-                                    setSortedBy("addedAt-asc")}
-                                }
-                            >
-                                Дата (возрастание)
-                            </Button>
-                            <Button
-                                view={sortedBy === "addedAt-desc" ? "action" : "outlined"}
-                                onClick={() => {
-                                    setWhichModalOpen(null)
-                                    setSortedBy("addedAt-desc")}
-                                }
-                            >
-                                Дата (убывание)
-                            </Button>
-                        </div>
-                        : <Select
+                    <Select
                             placeholder='Сортировать по'
                             options={sortOptions}
-                            onUpdate={(value) => setSortedBy(value[0] as TFilter)}
-                        />
-                    }
-
+                            onUpdate={(value) => setSortedBy(value[0] as TSort)}
+                    />
                 </div>
             </div>
 

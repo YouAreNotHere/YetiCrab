@@ -3,6 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Attraction } from './attraction.entity';
 import { CreateAttractionDto } from './create-attraction.dto';
+import fs from 'fs';
+import path from 'path';
 
 @Injectable()
 export class AttractionsService {
@@ -48,6 +50,25 @@ export class AttractionsService {
   }
 
   async remove(id: string): Promise<void> {
+    const attraction = await this.attractionsRepository.findOneBy({ id });
+
+    if (!attraction) {
+      throw new Error('Достопримечательность не найдена');
+    }
+    if (attraction.photoUrl && !attraction.photoUrl.startsWith('http')) {
+      try {
+        const fileName = path.basename(attraction.photoUrl); // Извлекаем имя файла
+        const uploadsDir = path.join(process.cwd(), 'uploads'); // Путь к папке uploads
+        const filePath = path.join(uploadsDir, fileName);
+        if (fs.existsSync(filePath)) {
+          fs.unlinkSync(filePath);
+        } else {
+          console.log('Файл не найден');
+        }
+      } catch (error) {
+        console.error('Ошибка при удалении файла:', error);
+      }
+    }
     await this.attractionsRepository.delete(id);
   }
 }
