@@ -30,6 +30,13 @@
   width: 10%;
 }
 
+.attraction-item__location{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
 .attraction-item__action-buttons{
   display: flex;
   gap: 4px;

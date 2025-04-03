@@ -11,7 +11,7 @@ function App() {
     const [attractions, setAttractions] = useState<IAttraction[]>([]);
     const [currentAttractions, setCurrentAttractions] = useState<IAttraction[]>([])
     const [isAddAttractionModalOpen, setIsAddAttractionModalOpen] = useState(false);
-    const [isAdminMode, setIsAdminMode] = useState(true);
+    const [isAdminMode, setIsAdminMode] = useState(false);
     const { data, makeRequest } = useRequest({ method: "GET", url: "attractions" });
 
     useEffect(() => {
@@ -31,7 +31,7 @@ function App() {
                     view="outlined-info"
                     onClick={() => setIsAdminMode(!isAdminMode)}
                 >
-                    Режим администратора
+                    {isAdminMode ? "В режим пользователя" : "В режим администратора"}
                 </Button>
                 <Button
                     view = "action"
@@ -46,12 +46,12 @@ function App() {
             <SearchInput
                 attractions={attractions}
                 setCurrentAttraction={setCurrentAttractions}/>
-            <AttractionModal
+            {isAddAttractionModalOpen && <AttractionModal
                 setAttractions={setAttractions}
                 getAttractions={makeRequest}
                 setIsModalOpen={setIsAddAttractionModalOpen}
                 isModalOpen={isAddAttractionModalOpen}
-            />
+            />}
             <AttractionsList
                 attractions={attractions}
                 setAttractions={setAttractions}

@@ -21,7 +21,7 @@ const SearchInput = ({ attractions, setCurrentAttraction }: Props) => {
             }
 
             const escapedText = searchText.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-            const regExp = new RegExp(`^${escapedText}`, "i");
+            const regExp = new RegExp(`${escapedText}`, "i");
             const filtered = attractions.filter((item) => regExp.test(item.name));
             setCurrentAttraction(filtered);
         },

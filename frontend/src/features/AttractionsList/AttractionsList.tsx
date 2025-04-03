@@ -2,7 +2,7 @@ import { IAttraction } from "../../shared/types/IAttraction.ts";
 import AttractionItem from "../AttractionItem/AttractionItem.tsx";
 import "./AttractionsList.scss";
 import { useState, useMemo } from "react";
-import { Button, Text } from "@gravity-ui/uikit";
+import { Button, Text, Select } from "@gravity-ui/uikit";
 
 interface Props {
     attractions: IAttraction[];
@@ -22,7 +22,21 @@ const AttractionsList = ({
     const [sortedBy, setSortedBy] = useState<
         "name-asc" | "name-desc" | "rating-asc" | "rating-desc" | "addedAt-asc" | "addedAt-desc"
     >("name-asc");
+    const [showOnlyRated, setShowOnlyRated] = useState(false);
     const [whichModalOpen, setWhichModalOpen] = useState<null | string>(null);
+    const filterOptions = [
+            {value: "all", content: "Показать все"},
+            {value: "visited", content: "Посещенные"},
+            {value: 'unvisited', content: 'Непосещенные'},
+        ];
+    const sortOptions = [
+        {value: "name-asc", content: "Имя (возрастание)"},
+        {value: "name-desc", content: "Имя (убывание)"},
+        {value: "rating-asc", content: "Рейтинг (возрастание)"},
+        {value: "rating-desc", content: "Рейтинг (убывание)"},
+        {value: "addedAt-asc", content: "Дата (возрастание)"},
+        {value: "addedAt-desc", content: "Дата (убывание)"},
+    ]
 
     const calculateAverageRating = (rating: number[]): number => {
         if (!rating || rating.length === 0) return 0;
@@ -44,26 +58,28 @@ const AttractionsList = ({
                 filtered = currentAttractions;
         }
 
+        if (showOnlyRated) filtered = filtered.filter((item) => item.rating.length > 0);
+
         const sorted = [...filtered].sort((a, b) => {
             let result = 0;
 
             switch (sortedBy) {
                 case "name-asc":
-                    result = a.name.localeCompare(b.name); // По имени (возрастание)
+                    result = a.name.localeCompare(b.name);
                     break;
                 case "name-desc":
-                    result = b.name.localeCompare(a.name); // По имени (убывание)
+                    result = b.name.localeCompare(a.name);
                     break;
                 case "rating-asc": {
                     const avgRatingA = calculateAverageRating(a.rating);
                     const avgRatingB = calculateAverageRating(b.rating);
-                    result = avgRatingA - avgRatingB; // По рейтингу (возрастание)
+                    result = avgRatingA - avgRatingB;
                     break;
                 }
                 case "rating-desc": {
                     const avgRatingA = calculateAverageRating(a.rating);
                     const avgRatingB = calculateAverageRating(b.rating);
-                    result = avgRatingB - avgRatingA; // По рейтингу (убывание)
+                    result = avgRatingB - avgRatingA;
                     break;
                 }
                 case "addedAt-asc":
@@ -82,47 +98,57 @@ const AttractionsList = ({
         });
 
         return sorted;
-    }, [currentAttractions, visibleAttractionsFilter, sortedBy]);
+    }, [currentAttractions, visibleAttractionsFilter, sortedBy, showOnlyRated]);
 
     return (
         <section className="attractions-form">
             <div className="attractions-form--inner-wrapper">
                 <h1>Достопримечательности</h1>
 
+                <Button
+                    view={showOnlyRated ? "action" : "outlined"}
+                    onClick = {()=> setShowOnlyRated(!showOnlyRated)}>
+                    {!showOnlyRated ? "Только с оценками" : "Показать все"}
+                </Button>
+
                 <div className="filter-and-sort">
-                    {whichModalOpen === "filter" ?
-                        <div className="filter-buttons">
-                        <Button
-                            view={visibleAttractionsFilter === "all" ? "action" : "outlined"}
-                            onClick={() => {
-                                setWhichModalOpen(null)
-                                setVisibleAttractionsFilter("all")}
-                            }
-                        >
-                            Показать все
-                        </Button>
-                        <Button
-                            view={visibleAttractionsFilter === "visited" ? "action" : "outlined"}
-                            onClick={() => {
-                                setWhichModalOpen(null)
-                                setVisibleAttractionsFilter("visited")}
-                            }
-                        >
-                            Показать только посещенные
-                        </Button>
-                        <Button
-                            view={visibleAttractionsFilter === "unvisited" ? "action" : "outlined"}
-                            onClick={() => {
-                                setWhichModalOpen(null)
-                                setVisibleAttractionsFilter("unvisited")}
-                            }
-                        >
-                            Показать только непосещенные
-                        </Button>
-                    </div>
-                        : <Button view = "outlined" onClick={()=>setWhichModalOpen("filter")}>
-                            Фильтровать по
-                         </Button>}
+                    {/*{whichModalOpen === "filter" ?*/}
+                    {/*    <div className="filter-buttons">*/}
+                    {/*    <Button*/}
+                    {/*        view={visibleAttractionsFilter === "all" ? "action" : "outlined"}*/}
+                    {/*        onClick={() => {*/}
+                    {/*            setWhichModalOpen(null)*/}
+                    {/*            setVisibleAttractionsFilter("all")}*/}
+                    {/*        }*/}
+                    {/*    >*/}
+                    {/*        Показать все*/}
+                    {/*    </Button>*/}
+                    {/*    <Button*/}
+                    {/*        view={visibleAttractionsFilter === "visited" ? "action" : "outlined"}*/}
+                    {/*        onClick={() => {*/}
+                    {/*            setWhichModalOpen(null)*/}
+                    {/*            setVisibleAttractionsFilter("visited")}*/}
+                    {/*        }*/}
+                    {/*    >*/}
+                    {/*        Посещенным*/}
+                    {/*    </Button>*/}
+                    {/*    <Button*/}
+                    {/*        view={visibleAttractionsFilter === "unvisited" ? "action" : "outlined"}*/}
+                    {/*        onClick={() => {*/}
+                    {/*            setWhichModalOpen(null)*/}
+                    {/*            setVisibleAttractionsFilter("unvisited")}*/}
+                    {/*        }*/}
+                    {/*    >*/}
+                    {/*        Непосещенным*/}
+                    {/*    </Button>*/}
+                    {/*</div>*/}
+                        {/*:*/}
+                    <Select
+                            placeholder='Фильтровать по'
+                            options={filterOptions}
+                            onUpdate={(value) => setVisibleAttractionsFilter(value[0] as TFilter)}
+                        />
+                {/*}*/}
 
                     {whichModalOpen === "sort" ?
                         <div className="sort-buttons">
@@ -133,7 +159,7 @@ const AttractionsList = ({
                                     setSortedBy("name-asc")}
                                 }
                             >
-                                По имени (возрастание)
+                                Имя (возрастание)
                             </Button>
                             <Button
                                 view={sortedBy === "name-desc" ? "action" : "outlined"}
@@ -142,7 +168,7 @@ const AttractionsList = ({
                                     setSortedBy("name-desc")}
                                 }
                             >
-                                По имени (убывание)
+                                Имя (убывание)
                             </Button>
                             <Button
                                 view={sortedBy === "rating-asc" ? "action" : "outlined"}
@@ -151,7 +177,7 @@ const AttractionsList = ({
                                     setSortedBy("rating-asc")}
                                 }
                             >
-                                По рейтингу (возрастание)
+                                Рейтинг (возрастание)
                             </Button>
                             <Button
                                 view={sortedBy === "rating-desc" ? "action" : "outlined"}
@@ -160,7 +186,7 @@ const AttractionsList = ({
                                     setSortedBy("rating-desc")}
                                 }
                             >
-                                По рейтингу (убывание)
+                                Рейтинг (убывание)
                             </Button>
                             <Button
                                 view={sortedBy === "addedAt-asc" ? "action" : "outlined"}
@@ -169,7 +195,7 @@ const AttractionsList = ({
                                     setSortedBy("addedAt-asc")}
                                 }
                             >
-                                По дате добавления (возрастание)
+                                Дата (возрастание)
                             </Button>
                             <Button
                                 view={sortedBy === "addedAt-desc" ? "action" : "outlined"}
@@ -178,12 +204,14 @@ const AttractionsList = ({
                                     setSortedBy("addedAt-desc")}
                                 }
                             >
-                                По дате добавления (убывание)
+                                Дата (убывание)
                             </Button>
                         </div>
-                        : <Button view = "outlined" onClick={()=>setWhichModalOpen("sort")}>
-                            Сортировать по
-                          </Button>
+                        : <Select
+                            placeholder='Сортировать по'
+                            options={sortOptions}
+                            onUpdate={(value) => setSortedBy(value[0] as TFilter)}
+                        />
                     }
 
                 </div>
@@ -225,7 +253,7 @@ const AttractionsList = ({
                     ) : null}
                 </div>
 
-                {!!visibleAttractions.length ? (
+                {visibleAttractions.length > 0 ? (
                     visibleAttractions.map((attraction) => (
                         <AttractionItem
                             key={attraction.id}

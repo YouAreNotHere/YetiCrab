@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
     Modal,
     Button,
@@ -45,10 +45,14 @@ const AttractionModal = ({
     const [latitude, setLatitude] = useState("");
     const [longitude, setLongitude] = useState("");
 
+    const isButtonDisabled = useMemo(() => {
+        return !name || !description || !location
+            || !latitude || !longitude || (!photoUrl && !image);
+    }, [name, description, location, latitude, longitude, photoUrl, image]);
 
-    const isButtonDisabled  = !name || !description || !location
-        || !latitude || !longitude || (!photoUrl && !image);
-    const isBothOfLinkAndImage = !!photoUrl && !!image;
+    const isBothOfLinkAndImage = useMemo(() => {
+        return !!photoUrl && !!image;
+    }, [photoUrl, image]);
     console.log(`isBothOfLinkAndImage ${isBothOfLinkAndImage}`)
 
 
@@ -86,9 +90,10 @@ const AttractionModal = ({
 
         if (attraction.id && attractions) {
             updateAttraction(formData);
+            console.log(attractions)
             setAttractions(
                 attractions.map((item) =>
-                    attraction.id === item.id
+                    attraction.id !== item.id
                         ? item
                         : {
                             ...item,
@@ -132,12 +137,7 @@ const AttractionModal = ({
     }
 
     return (
-        <Modal
-            open={isModalOpen}
-            onClose={() => setIsModalOpen(false)}
-            size="m"
-            title={attraction.id ? "Редактировать достопримечательность" : "Добавить достопримечательность"}
-        >
+        <Modal open={isModalOpen}>
             <div className="attraction-modal__content">
                 <TextInput
                     placeholder="Название"
@@ -166,7 +166,7 @@ const AttractionModal = ({
                             accept="image/*"
                             onChange={handleImageChange}
                         />
-                        {image ?
+                        {image &&
                             <Button
                                 view = "flat"
                                 onClick={()=> {
@@ -175,12 +175,9 @@ const AttractionModal = ({
                                 }}
                             >
                               Удалить изображение
-                            </Button>
-                            : null }
+                            </Button>}
                     </div>
-                    {isBothOfLinkAndImage ?
-                        <p>Удалите изображение или ссылку</p>
-                        : null}
+                    {isBothOfLinkAndImage && <p>Удалите изображение или ссылку</p>}
                     {preview && (
                         <img
                             src={

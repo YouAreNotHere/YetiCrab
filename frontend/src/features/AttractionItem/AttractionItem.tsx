@@ -7,7 +7,7 @@ import Pen from "../../assets/Pen.tsx";
 import AttractionModal from "../AttractionModal/AttractionModal.tsx";
 import {
     Text,
-    Button,
+    Button, Link,
 } from '@gravity-ui/uikit';
 import {useState} from "react";
 
@@ -83,7 +83,6 @@ const AttractionItem = ({ attraction, setAttractions, attractions, isAdminMode }
                 className="attraction-item__image"
             />
 
-            {/* Рейтинг */}
             <div className={"attraction-item__rating"}>
                 <Text variant="body-1">{rating}</Text>
                 <div className="rating-buttons">
@@ -106,9 +105,15 @@ const AttractionItem = ({ attraction, setAttractions, attractions, isAdminMode }
                 </div>
             </div>
 
-            <Text variant="body-1" className={"attraction-item__location"}>
-                {location}
-            </Text>
+            <div className={"attraction-item__location"}>
+                <Text variant="body-1" className={"attraction-item__location"}>
+                    {location}
+                </Text>
+                <Link href={mapLink}>
+                    На карте
+                </Link>
+            </div>
+
 
             <Text variant="body-2" color="secondary" className={"attraction-item__addedAt"}>
                 {formattedDate}
@@ -131,13 +136,13 @@ const AttractionItem = ({ attraction, setAttractions, attractions, isAdminMode }
                     <Cross/>
                 </Button>
             </div>
-            <AttractionModal
+            {isModalOpen && <AttractionModal
                 setIsModalOpen={setIsModalOpen}
                 isModalOpen={isModalOpen}
                 attraction={attraction}
                 attractions={attractions}
                 setAttractions={setAttractions}
-            />
+            />}
         </div>
     );
 };
