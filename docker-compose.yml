@@ -20,7 +20,6 @@ services:
     volumes:
       - "./backend:/app"
       - "/app/node_modules"
-#      - "./uploads:/backend/uploads"
     depends_on:
       db:
         condition: service_healthy
@@ -38,7 +37,6 @@ services:
       MYSQL_PASSWORD: 123456
     volumes:
       - /tmp/dbdata:/var/lib/mysql
-#      - ./mysql-config:/etc/mysql/conf.d
     ports:
       - "3306:3306"
     healthcheck:

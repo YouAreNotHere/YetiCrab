@@ -6,26 +6,30 @@
   gap: 15px;
 }
 
-.attraction-modal--hidden{
+.attraction-modal--hidden {
   display: none;
 }
 
-.attraction-modal__pictures{
+.attraction-modal__button-wrapper {
+  align-self: end;
+}
+
+.attraction-modal__pictures {
   display: flex;
   gap: 15px;
   flex-direction: column;
 
-  p{
+  p {
     margin: 0;
     font-weight: bold;
   }
 }
 
-.attraction-modal__buttons-wrapper{
+.attraction-modal__buttons-wrapper {
   display: flex;
   justify-content: space-between;
 }
 
-.attraction-modal__inner-wrapper{
+.attraction-modal__inner-wrapper {
   display: flex;
 }

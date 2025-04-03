@@ -3,9 +3,8 @@
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
+  height: 100vh;
 }
-
-
 
 .logo {
   height: 6em;
@@ -43,12 +42,11 @@
   color: #888;
 }
 
-.admin-button{
+.admin-button {
   align-self: end;
   justify-self: end;
   display: flex;
-  margin-bottom: 20px;
-  display: flex;
+  margin: 20px 0 20px 0;
   flex-direction: column;
   gap: 15px;
   width: 250px;

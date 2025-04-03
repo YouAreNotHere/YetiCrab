@@ -12,7 +12,11 @@ export interface IAttraction {
   isVisited: boolean;
 }
 
-export interface IUpdatedAttraction extends Omit<IAttraction, 'id' | 'addedAt' | 'rating' | 'latitude' | 'longitude'> {
+export interface IUpdatedAttraction
+  extends Omit<
+    IAttraction,
+    'id' | 'addedAt' | 'rating' | 'latitude' | 'longitude'
+  > {
   id?: string;
   addedAt?: Date;
   rating?: number[];

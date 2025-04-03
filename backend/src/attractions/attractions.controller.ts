@@ -16,7 +16,6 @@ import { Express } from 'express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 
-// DTO для создания достопримечательности
 interface CreateAttractionDto {
   name: string;
   description: string;
@@ -26,7 +25,6 @@ interface CreateAttractionDto {
   photoUrl?: string;
 }
 
-// DTO для обновления достопримечательности
 interface UpdateAttractionDto {
   name?: string;
   description?: string;
@@ -34,7 +32,7 @@ interface UpdateAttractionDto {
   latitude?: number;
   longitude?: number;
   photoUrl?: string;
-  rating?: number[];
+  rating?: number[] | string;
   mapLink?: string;
   isVisited?: boolean;
 }
@@ -83,8 +81,8 @@ export class AttractionsController {
         name,
         description,
         location,
-        latitude: parseFloat(latitude),
-        longitude: parseFloat(longitude),
+        latitude: parseFloat(latitude.toString()),
+        longitude: parseFloat(longitude.toString()),
         photoUrl: photoUrl || undefined,
       };
       if (file) {
@@ -119,20 +117,31 @@ export class AttractionsController {
       })
   )
   async update(
-    @Param('id') id: string,
-    @Body() body: UpdateAttractionDto,
-    @UploadedFile() file: Express.Multer.File
+      @Param('id') id: string,
+      @Body() body: UpdateAttractionDto,
+      @UploadedFile() file: Express.Multer.File
   ) {
     console.log('Updating attraction with ID:', id);
     console.log('Update data:', body);
 
     let rating: number[] = [];
     if (body.rating) {
-      try {
-        rating = JSON.parse(body.rating as string);
-      } catch (error) {
-        console.error('Failed to parse rating:', error);
-        throw new BadRequestException('Invalid rating format');
+      if (typeof body.rating === 'string') {
+        try {
+          const parsedRating = JSON.parse(body.rating) as unknown;
+          if (Array.isArray(parsedRating) && parsedRating.every(item => typeof item === 'number')) {
+            rating = parsedRating;
+          } else {
+            throw new Error('Rating must be an array of numbers');
+          }
+        } catch (error) {
+          console.error('Failed to parse rating:', error);
+          throw new BadRequestException('Invalid rating format - must be an array of numbers');
+        }
+      } else if (Array.isArray(body.rating) && body.rating.every(item => typeof item === 'number')) {
+        rating = body.rating;
+      } else {
+        throw new BadRequestException('Invalid rating format - must be an array of numbers');
       }
     }
 

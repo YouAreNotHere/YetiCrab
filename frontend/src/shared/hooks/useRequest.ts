@@ -24,10 +24,10 @@ const useRequest = (props: IUseRequestProps) => {
 
     if (import.meta.env.MODE === 'production') {
       urlAdress = import.meta.env.VITE_REACT_APP_API_URL_PROD;
-      console.log("prod")
+      console.log('prod');
     } else {
       urlAdress = import.meta.env.VITE_REACT_APP_API_URL_DEV;
-      console.log("dev")
+      console.log('dev');
     }
 
     try {
@@ -50,7 +50,7 @@ const useRequest = (props: IUseRequestProps) => {
       } else if (method === 'DELETE') {
         response = await fetch(`${urlAdress}${url}`, {
           method,
-          headers: {'Content-Type': 'application/json'},
+          headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
         });
       } else if (method === 'PUT') {
@@ -61,17 +61,16 @@ const useRequest = (props: IUseRequestProps) => {
         });
       }
 
-
       if (response.ok) {
         const data = await response.json();
         setData(data);
         setErrorMessage(null);
         if (onSuccess) {
-           onSuccess(data);
+          onSuccess(data);
         }
       } else {
         const error = await response.json();
-        console.log(error)
+        console.log(error);
 
         if (response.status === 401) {
           // navigate('/auth');
