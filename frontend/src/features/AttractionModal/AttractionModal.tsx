@@ -1,11 +1,15 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { Modal, Button, TextInput, TextArea, Text } from '@gravity-ui/uikit';
+import {useForm, Controller} from "react-hook-form";
+
 import { useRequest } from '../../shared/hooks/useRequest.ts';
 import {
   IAttraction,
   IUpdatedAttraction,
+    IFetchAttraction,
 } from '../../shared/types/IAttraction.ts';
 import Cross from '../../assets/Cross.tsx';
+
 import './AttractionModal.scss';
 
 interface Props {
@@ -17,12 +21,14 @@ interface Props {
   setAttractions: React.Dispatch<React.SetStateAction<IAttraction[]>>;
 }
 
-const emptyAttraction = {
+const emptyAttraction: IFetchAttraction = {
   id: '',
   name: '',
   description: '',
   photoUrl: '',
   location: '',
+    latitude: '',
+    longitude: '',
   mapLink: '',
   isVisited: false,
 };
@@ -35,41 +41,33 @@ const AttractionModal = ({
   setAttractions,
   attractions,
 }: Props) => {
-  const [name, setName] = useState(attraction.name);
-  const [description, setDescription] = useState(attraction.description);
-  const [preview, setPreview] = useState<string | null>(attraction?.photoUrl);
-  const [image, setImage] = useState<File | null>(null);
-  const [photoUrl, setPhotoURL] = useState(attraction?.photoUrl);
-  const [location, setLocation] = useState(attraction?.location);
-  const [latitude, setLatitude] = useState('');
-  const [longitude, setLongitude] = useState('');
 
-  const isButtonDisabled = useMemo(() => {
-    return (
-      !name ||
-      name.length > 15 ||
-      !description ||
-      !location ||
-      !latitude ||
-      !longitude ||
-      (!photoUrl && !image)
-    );
-  }, [name, description, location, latitude, longitude, photoUrl, image]);
+  const [preview, setPreview] = useState<string | null>(attraction?.photoUrl);
+
+  const {
+    handleSubmit,
+      watch,
+      setValue,
+    control,
+    reset,
+    formState: {errors},} = useForm< IFetchAttraction>({mode: "onBlur",});
+
+  const name = watch("name");
+  const description = watch("description");
+  const image = watch("image");
+  const photoUrl = watch("photoUrl");
+  const location = watch("location");
+  const latitude = watch("latitude");
+  const longitude = watch("longitude");
 
   const isBothOfLinkAndImage = useMemo(() => {
     return !!photoUrl && !!image;
   }, [photoUrl, image]);
 
   useEffect(() => {
-    setName(attraction.name);
-    setDescription(attraction.description);
-    setPreview(attraction.photoUrl || null);
-    setPhotoURL(attraction.photoUrl || '');
-    setLocation(attraction.location || '');
-    setLatitude(attraction.latitude?.toString() || '');
-    setLongitude(attraction.longitude?.toString() || '');
-    setImage(null);
-  }, [isModalOpen, attraction]);
+      if (!attraction) return
+    reset(attraction);
+  }, [isModalOpen, attraction, reset]);
 
   const { makeRequest: createAttraction } = useRequest({
     method: 'POST',
@@ -81,16 +79,16 @@ const AttractionModal = ({
     url: `attractions/${attraction.id}`,
   });
 
-  const onSubmitHandler = () => {
+  const onSubmitHandler = (data: IFetchAttraction) => {
     const formData = new FormData();
 
-    formData.append('name', name);
-    formData.append('description', description);
-    if (image) formData.append('image', image);
-    if (photoUrl) formData.append('photoUrl', photoUrl);
-    formData.append('location', location);
-    formData.append('latitude', latitude);
-    formData.append('longitude', longitude);
+    formData.append('name', data.name);
+    formData.append('description', data.description);
+    if (data.image) formData.append('image', data.image);
+    if (data.photoUrl) formData.append('photoUrl', data.photoUrl);
+    formData.append('location', data.location);
+    formData.append('latitude', String(data.latitude));
+    formData.append('longitude', String(data.longitude));
 
     if (attraction.id && attractions) {
       updateAttraction(formData);
@@ -116,27 +114,15 @@ const AttractionModal = ({
     setIsModalOpen(false);
   };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>, setImg: (file: File) => void) => {
     if (e.target.files === null) return;
     const file = e.target.files[0];
-    setImage(file);
+    setImg(file);
     const reader = new FileReader();
     reader.onloadend = () => {
       setPreview(reader.result as string);
     };
     reader.readAsDataURL(file);
-  };
-
-  const onCancelSubmit = () => {
-    setImage(null);
-    setName('');
-    setLatitude('');
-    setLongitude('');
-    setDescription('');
-    setPhotoURL('');
-    setPreview('');
-    setLocation('');
-    setIsModalOpen(false);
   };
 
   const modalRef = useRef<HTMLDivElement>(null);
@@ -161,86 +147,174 @@ const AttractionModal = ({
     <Modal open={isModalOpen}>
       <div className="attraction-modal__content" ref={modalRef}>
         <div className="attraction-modal__button-wrapper">
-          <Button view="flat" onClick={onCancelSubmit}>
-            <Cross />
+          <Button
+              view="flat"
+              onClick={() => setIsModalOpen(false)}
+          >
+            <Cross/>
           </Button>
         </div>
-        <TextInput
-          placeholder="Название"
-          value={name}
-          onUpdate={(value) => setName(value)}
-        />
-        {name.length > 15 && (
-          <Text variant='body-2'>Название слишком длинное</Text>
-        )}
-        <TextArea
-          placeholder="Описание"
-          value={description}
-          onUpdate={(value) => setDescription(value)}
-        />
-        <div className={'attraction-modal__pictures'}>
-          <p>Укажите ссылку на фото или прикрепите само фото</p>
-          <TextInput
-            placeholder="Ссылка на фото"
-            value={photoUrl}
-            onUpdate={(value) => {
-              setPreview(value);
-              setPhotoURL(value);
-            }}
+
+          <Controller
+              name="name"
+              control={control}
+              rules={{
+                required: "Название не заполнено",
+                maxLength: {message: "Название слишком длинное", value: 25}
+              }}
+              render={({field}) => (
+                  <TextInput
+                      placeholder="Название"
+                      ref={field.ref}
+                      value={field.value}
+                      onUpdate={(value) => field.onChange(value)}
+                  />
+              )}
           />
+          {errors.name && (
+              <Text color="danger">{(errors.name as { message: string }).message}</Text>
+          )}
+
+        <Controller
+          name="description"
+          control={control}
+          rules = {{required: "Описание не заполнено"}}
+          render={({field}) => (
+              <TextArea
+                  placeholder="Описание"
+                  value={field.value}
+                  onUpdate={(value) => field.onChange(value)}
+                  ref={field.ref}
+              />
+          )}
+          />
+          {errors.description && (
+              <Text color="danger">{(errors.description as { message: string }).message}</Text>
+          )}
+
+        <div className={'attraction-modal__pictures'}>
+
+          <Text variant="body-1" >Укажите ссылку на фото или прикрепите само фото</Text>
+
+          <Controller
+              name="photoUrl"
+              control={control}
+              rules={{
+                  maxLength: {message: "Ссылка слишком длинная", value: 50}
+              }}
+              render={({field}) => (
+                  <TextInput
+                      placeholder="Ссылка на фото"
+                      value={field.value}
+                      ref={field.ref}
+                      onUpdate={(value) => {
+                        setPreview(value);
+                        field.onChange(value)
+                      }}
+                  />
+              )} />
+            {errors.photoUrl && (
+                <Text color="danger">{(errors.photoUrl as { message: string }).message}</Text>
+            )}
+
           <div className={'attraction-modal__buttons-wrapper'}>
-            <input
-              id="file-upload"
-              type="file"
-              accept="image/*"
-              onChange={handleImageChange}
-            />
-            {image && (
-              <Button
-                view="flat"
-                onClick={() => {
-                  setImage(null);
-                  setPreview('');
-                }}
-              >
-                Удалить изображение
-              </Button>
+            <Controller
+                name={"image"}
+                control={control}
+                render={({field}) => (
+                    <input
+                        id="file-upload"
+                        type="file"
+                        ref={field.ref}
+                        accept="image/*"
+                        onChange={(e) => handleImageChange(e, field.onChange)}
+                    />
+                )}
+                />
+                {image && (
+                    <Button
+                        view="flat"
+                        onClick={() => {
+                          setValue("image",undefined);
+                          setPreview('');
+                    }}
+                >
+                  Удалить изображение
+                </Button>
             )}
           </div>
+
           {isBothOfLinkAndImage && <p>Удалите изображение или ссылку</p>}
+
           {preview && (
-            <img
-              src={
-                preview.startsWith('http') || preview.startsWith('data:image')
-                  ? preview
-                  : `http://localhost:8081${preview}`
-              }
-              alt={name}
-              width={200}
-              height={200}
-            />
+              <img
+                  src={
+                    preview.startsWith('http') || preview.startsWith('data:image')
+                        ? preview
+                        : `http://localhost:8081${preview}`
+                  }
+                  alt={name}
+                  width={200}
+                  height={200}
+              />
           )}
         </div>
-        <TextInput
-          placeholder="Местонахождение"
-          value={location}
-          onUpdate={(value) => setLocation(value)}
+
+        <Controller
+            name={"location"}
+            control={control}
+            rules = {{required: "Местоположение не заполнено"}}
+            render={({field}) => (
+                <TextInput
+                    placeholder="Местонахождение"
+                    ref={field.ref}
+                    value={field.value}
+                    onUpdate={(value) => field.onChange(value)}
+                />
+            )}
         />
-        <TextInput
-          placeholder="Широта"
-          value={latitude}
-          onUpdate={(value) => setLatitude(value)}
-        />
-        <TextInput
-          placeholder="Долгота"
-          value={longitude}
-          onUpdate={(value) => setLongitude(value)}
-        />
+          {errors.location && (
+              <Text color="danger">{(errors.location as { message: string }).message}</Text>
+          )}
+
+        <Controller
+            name={"latitude"}
+            control = {control}
+            rules = {{required: "Широта не заполнена"}}
+            render={({field})=> (
+                <TextInput
+                    placeholder="Широта"
+                    value={String(field.value)}
+                    ref={field.ref}
+                    onUpdate={(value) => field.onChange(value)}
+                />
+            )}
+            />
+          {errors.latitude && (
+              <Text color="danger">{(errors.latitude as { message: string }).message}</Text>
+          )}
+
+        <Controller
+            name={"longitude"}
+            control={control}
+            rules = {{required: "Долгота  не заполнена"}}
+            render={({field})=> (
+                <TextInput
+                    placeholder="Долгота"
+                    value={String(field.value)}
+                    ref={field.ref}
+                    onUpdate={(value) => field.onChange(value)}
+                />
+            )}
+            />
+          {errors.longitude && (
+              <Text color="danger">{(errors.longitude as { message: string }).message}</Text>
+          )}
+
         <div className="attraction-modal__buttons">
           <Button
-            disabled={isButtonDisabled || isBothOfLinkAndImage}
-            view="action"
-            onClick={onSubmitHandler}
+              view="action"
+              onClick={handleSubmit(onSubmitHandler)}
           >
             Подтвердить
           </Button>

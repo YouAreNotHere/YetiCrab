@@ -20,6 +20,15 @@ export interface IUpdatedAttraction
   id?: string;
   addedAt?: Date;
   rating?: number[];
-  latitude?: number;
-  longitude?: number;
+  latitude?: number | string;
+  longitude?: number | string;
 }
+
+export interface IFetchAttraction
+    extends Omit<
+        IUpdatedAttraction,
+        'image'
+    > {
+  image?: Blob | undefined;
+}
+
