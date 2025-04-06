@@ -200,7 +200,9 @@ const AttractionModal = ({
               name="photoUrl"
               control={control}
               rules={{
-                  maxLength: {message: "Ссылка слишком длинная", value: 50}
+                  maxLength: {message: "Ссылка слишком длинная", value: 50},
+                  validate: (value, formValues) =>
+                      !value && !formValues.image ? "Необходимо указать ссылку или загрузить файл" : true
               }}
               render={({field}) => (
                   <TextInput
@@ -213,14 +215,15 @@ const AttractionModal = ({
                       }}
                   />
               )} />
-            {errors.photoUrl && (
-                <Text color="danger">{(errors.photoUrl as { message: string }).message}</Text>
-            )}
 
           <div className={'attraction-modal__buttons-wrapper'}>
             <Controller
                 name={"image"}
                 control={control}
+                rules={{
+                    validate: (value, formValues) =>
+                        !value && !formValues.photoUrl ? "Необходимо указать ссылку или загрузить файл" : true
+                }}
                 render={({field}) => (
                     <input
                         id="file-upload"
@@ -244,7 +247,13 @@ const AttractionModal = ({
             )}
           </div>
 
-          {isBothOfLinkAndImage && <p>Удалите изображение или ссылку</p>}
+            {(errors.photoUrl || errors.image) && (
+                <Text color="danger">
+                    {errors.photoUrl?.message || errors.image?.message}
+                </Text>
+            )}
+
+          {isBothOfLinkAndImage && <Text color = "danger">Допустимо оставить либо ссылку на картинку, либо файл с картинкой</Text>}
 
           {preview && (
               <img
