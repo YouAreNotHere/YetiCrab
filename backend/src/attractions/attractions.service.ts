@@ -22,7 +22,7 @@ export class AttractionsService {
   }
 
   async create(createAttractionDto: CreateAttractionDto): Promise<Attraction> {
-    console.log('AttractionsService: Starting to create attraction...'); // Логирование начала
+    console.log('AttractionsService: Starting to create attraction...'); 
 
     try {
       console.log('AttractionsService: DTO received:', createAttractionDto);
@@ -36,11 +36,11 @@ export class AttractionsService {
       });
 
       const savedAttraction = await this.attractionsRepository.save(attraction);
-      console.log('AttractionsService: Attraction created and saved:', savedAttraction); // Логирование завершения
+      console.log('AttractionsService: Attraction created and saved:', savedAttraction); 
       return savedAttraction;
     } catch (error) {
-      console.error('AttractionsService: Error occurred:', error); // Логирование ошибок
-      throw error; // Передаём ошибку дальше
+      console.error('AttractionsService: Error occurred:', error); 
+      throw error; 
     }
   }
 
