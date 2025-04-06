@@ -11,11 +11,9 @@ const AppDataSource = new DataSource({
   database: process.env.DB_NAME || 'test_db',
   entities: [`${__dirname}/**/*.entity{.ts,.js}`],
   migrations: [`${__dirname}/migrations/*{.ts,.js}`],
-  synchronize: false,
+  synchronize: true,
   logging: true,
 });
 
 console.log('Exporting DataSource...');
-module.exports = AppDataSource;
-
-// npx typeorm-ts-node-commonjs migration:run -d ormconfig.cjs
+module.exports = { AppDataSource }; 

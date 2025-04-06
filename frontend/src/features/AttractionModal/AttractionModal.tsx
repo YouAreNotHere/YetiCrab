@@ -165,7 +165,7 @@ const AttractionModal = ({
               render={({field}) => (
                   <TextInput
                       placeholder="Название"
-                      ref={field.ref}
+                      controlRef={field.ref}
                       value={field.value}
                       onUpdate={(value) => field.onChange(value)}
                   />
@@ -184,7 +184,7 @@ const AttractionModal = ({
                   placeholder="Описание"
                   value={field.value}
                   onUpdate={(value) => field.onChange(value)}
-                  ref={field.ref}
+                  controlRef={field.ref}
               />
           )}
           />
@@ -206,7 +206,7 @@ const AttractionModal = ({
                   <TextInput
                       placeholder="Ссылка на фото"
                       value={field.value}
-                      ref={field.ref}
+                      controlRef={field.ref}
                       onUpdate={(value) => {
                         setPreview(value);
                         field.onChange(value)
@@ -267,7 +267,7 @@ const AttractionModal = ({
             render={({field}) => (
                 <TextInput
                     placeholder="Местонахождение"
-                    ref={field.ref}
+                    controlRef={field.ref}
                     value={field.value}
                     onUpdate={(value) => field.onChange(value)}
                 />
@@ -285,7 +285,7 @@ const AttractionModal = ({
                 <TextInput
                     placeholder="Широта"
                     value={String(field.value)}
-                    ref={field.ref}
+                    controlRef={field.ref}
                     onUpdate={(value) => field.onChange(value)}
                 />
             )}
@@ -302,7 +302,7 @@ const AttractionModal = ({
                 <TextInput
                     placeholder="Долгота"
                     value={String(field.value)}
-                    ref={field.ref}
+                    controlRef={field.ref}
                     onUpdate={(value) => field.onChange(value)}
                 />
             )}
