@@ -8,7 +8,9 @@ This is a full-stack application for managing tourist attractions. The backend i
 1. [Prerequisites](#prerequisites)
 2. [Installation](#installation)
 3. [Running the Application](#running-the-application)
-4. [REST API Documentation](#rest-api-documentation)
+4. [Seed Data](#seed-data)
+5. [Important Notes](#important-notes)
+6. [REST API Documentation](#rest-api-documentation)
 
 
 ## Prerequisites
@@ -26,11 +28,7 @@ Before running the project, ensure you have the following installed:
    
 
 2. **Start docker**
-  - type "docker exec -it db bash"
-  - type "mysql -u YouAreNotHere -p" (password 123456)
-  - type "create database if not exists <DB_NAME>" (DB_NAME has in docker-compose.yaml -> services.db.environment.MYSQL_DATABASE)
-  - docker-compose down
-  - docker-compose up -d
+  - type docker-compose up -d
 
 
 ## Running the Application
@@ -38,7 +36,47 @@ Before running the project, ensure you have the following installed:
 Once the containers are up and running, you can access the application at the following URLs:
 - **Frontend:** `http://localhost:5173`
 - **Backend API:** `http://localhost:8081`
-- **Database:** `mysql://YouAreNotHere:123456@localhost:3306/test_db`
+- **Database:** `mysql://YouAreNotHere:123456@localhost:3306/app_db`
+
+## Seed Data
+
+The application includes **seed data** functionality to populate the database with initial attraction records. By default, this functionality is disabled. To enable it:
+
+1. Uncomment the following lines in `app/backend/src/main.ts`:
+   - Line 6: Import `seedAttractions`:
+     ```typescript
+     import { seedAttractions } from './attractions/attractions.seed';
+     ```
+   - Line 43: Call `seedAttractions()`:
+     ```typescript
+     await seedAttractions();
+     ```
+
+2. Ensure that the file `app/backend/src/attractions/attractions.seed.ts` is uncommented and contains the seed data logic.
+
+3. Start the application. The seed data will be added to the database during initialization.
+
+> **Note:** After the seed data is added, it is recommended to comment out the above lines again to prevent duplicate entries on subsequent runs.
+
+---
+
+## Important Notes
+
+1. **Migration Execution Time:**
+   After starting the containers, the backend may take up to **3 minutes** to become fully operational. This delay is due to the execution of database migrations. During this time, the backend may not respond to requests. Please wait until the migrations are complete before using the application.
+
+2. **Database Cleanup:**
+   If you need to reset the database or start with a clean slate, you can delete the Docker volume used by MySQL:
+   ```bash
+   docker-compose down -v
+   docker-compose up -d
+
+2. **Database initialization issues:**
+  If problems occur during the database startup, follow these steps:
+  Type docker exec -it db bash
+  Type mysql -u YouAreNotHere -p (password: 123456)
+  Type create database if not exists <DB_NAME> (DB_NAME is defined in docker-compose.yaml under services.db.environment.MYSQL_DATABASE)
+  Run docker-compose down
 
 
 ## REST API Documentation
