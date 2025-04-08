@@ -121,6 +121,7 @@ const AttractionItem = ({
         }
         alt={name}
         className="attraction-item__image"
+        loading="lazy"
       />
 
       <div className={'attraction-item__rating'}>
