@@ -3,7 +3,7 @@ import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 const { AppDataSource } = require('../ormconfig.cjs'); 
-// import { seedAttractions} from './attractions/attractions.seed'
+import { seedAttractions} from './attractions/attractions.seed'
 import morgan from 'morgan';
 
 async function bootstrap() {
@@ -40,7 +40,7 @@ async function bootstrap() {
     }
     
     // Запуск сидинга
-    // await seedAttractions();
+    await seedAttractions();
 
   } catch (err) {
     console.error('Error during Data Source initialization or seeding:', err);

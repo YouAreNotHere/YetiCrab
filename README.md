@@ -28,7 +28,7 @@ Before running the project, ensure you have the following installed:
    
 
 2. **Start docker**
-  - type docker-compose up -d
+  - type docker-compose up -d --build
 
 
 ## Running the Application
@@ -40,9 +40,9 @@ Once the containers are up and running, you can access the application at the fo
 
 ## Seed Data
 
-The application includes **seed data** functionality to populate the database with initial attraction records. By default, this functionality is disabled. To enable it:
+The application includes **seed data** functionality to populate the database with initial attraction records. By default, this functionality is enabled. To disable it:
 
-1. Uncomment the following lines in `app/backend/src/main.ts`:
+1. Comment the following lines in `app/backend/src/main.ts`:
    - Line 6: Import `seedAttractions`:
      ```typescript
      import { seedAttractions } from './attractions/attractions.seed';
@@ -52,7 +52,7 @@ The application includes **seed data** functionality to populate the database wi
      await seedAttractions();
      ```
 
-2. Ensure that the file `app/backend/src/attractions/attractions.seed.ts` is uncommented and contains the seed data logic.
+2. Ensure that the file `app/backend/src/attractions/attractions.seed.ts` is commented.
 
 3. Start the application. The seed data will be added to the database during initialization.
 

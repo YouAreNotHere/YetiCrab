@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   frontend:
     container_name: frontend_c
@@ -8,6 +10,8 @@ services:
     volumes:
       - "./frontend:/app"
       - "/app/node_modules"
+    networks:
+      - app-network
 
   backend:
     container_name: backend_c
@@ -28,7 +32,8 @@ services:
       DB_PASSWORD: 123456
       DB_NAME: app_db
     restart: on-failure
-
+    networks:
+      - app-network
 
   db:
     image: mysql:8.4
@@ -38,8 +43,9 @@ services:
       MYSQL_DATABASE: app_db
       MYSQL_USER: YouAreNotHere
       MYSQL_PASSWORD: 123456
+      MYSQL_DISABLE_SSL: 1  # Отключаем SSL для WSL2
     volumes:
-      - ./dbdata:/var/lib/mysql
+      - mysql_data:/var/lib/mysql  # Используем named volume
     ports:
       - "3306:3306"
     healthcheck:
@@ -47,3 +53,12 @@ services:
       interval: 20s
       timeout: 10s
       retries: 30
+    networks:
+      - app-network
+
+volumes:
+  mysql_data:  # Объявляем named volume для MySQL
+
+networks:
+  app-network:
+    driver: bridge

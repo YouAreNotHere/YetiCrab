@@ -289,7 +289,13 @@ const AttractionModal = ({
         <Controller
             name={"latitude"}
             control = {control}
-            rules = {{required: "Широта не заполнена"}}
+            rules = {{
+                required: "Широта не заполнена",
+                pattern: {
+                    value: /^-?\d*\.?\d+$/,
+                    message: "Широта должна быть числом"
+                }
+            }}
             render={({field})=> (
                 <TextInput
                     placeholder="Широта"
@@ -306,7 +312,13 @@ const AttractionModal = ({
         <Controller
             name={"longitude"}
             control={control}
-            rules = {{required: "Долгота  не заполнена"}}
+            rules = {{
+                required: "Долгота  не заполнена",
+                pattern: {
+                    value: /^-?\d*\.?\d+$/,
+                    message: "Долгота должна быть числом"
+                }
+        }}
             render={({field})=> (
                 <TextInput
                     placeholder="Долгота"
